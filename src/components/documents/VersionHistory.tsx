@@ -10,6 +10,15 @@ import {
   RotateCcw,
   X,
 } from "lucide-react";
+import type { DocumentVersion } from "../../types/documents.ts";
+
+interface VersionHistoryProps {
+  documentId: string | null;
+  currentVersion: number;
+  getVersions: (documentId: string) => DocumentVersion[];
+  restoreVersion: (versionId: string) => boolean | void;
+  onClose?: () => void;
+}
 
 export default function VersionHistory({
   documentId,
@@ -17,11 +26,13 @@ export default function VersionHistory({
   getVersions,
   restoreVersion,
   onClose,
-}) {
-  const [versions, setVersions] = useState([]);
-  const [expandedVersion, setExpandedVersion] = useState(null);
+}: VersionHistoryProps) {
+  const [versions, setVersions] = useState<DocumentVersion[]>([]);
+  const [expandedVersion, setExpandedVersion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [confirmingVersion, setConfirmingVersion] = useState(null);
+  const [confirmingVersion, setConfirmingVersion] = useState<
+    DocumentVersion | null
+  >(null);
 
   useEffect(() => {
     if (documentId) {
@@ -37,7 +48,7 @@ export default function VersionHistory({
     }
   }, [documentId, getVersions]);
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -48,12 +59,12 @@ export default function VersionHistory({
     }).format(date);
   };
 
-  const handleRestore = (version) => {
+  const handleRestore = (version: DocumentVersion) => {
     // Set the version we're confirming
     setConfirmingVersion(version);
   };
 
-  const confirmRestore = (version) => {
+  const confirmRestore = (version: DocumentVersion) => {
     // Actually restore the version
     restoreVersion(version.id);
     setConfirmingVersion(null);
@@ -65,7 +76,7 @@ export default function VersionHistory({
   };
 
   const groupVersionsByDay = () => {
-    const groups = {};
+    const groups: Record<string, DocumentVersion[]> = {};
 
     versions.forEach((version) => {
       const date = new Date(version.timestamp);
@@ -82,15 +93,16 @@ export default function VersionHistory({
     return Object.entries(groups).map(([day, dayVersions]) => ({
       day,
       date: new Date(day),
-      versions: dayVersions.sort((a, b) =>
-        new Date(b.timestamp) - new Date(a.timestamp)
+      versions: dayVersions.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       ),
-    })).sort((a, b) => b.date - a.date);
+    })).sort((a, b) => b.date.getTime() - a.date.getTime());
   };
 
   const versionGroups = groupVersionsByDay();
 
-  const formatDay = (dateString) => {
+  const formatDay = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
     const yesterday = new Date(today);
@@ -109,7 +121,7 @@ export default function VersionHistory({
     }
   };
 
-  const toggleExpandVersion = (version) => {
+  const toggleExpandVersion = (version: DocumentVersion) => {
     if (expandedVersion === version.id) {
       setExpandedVersion(null);
     } else {

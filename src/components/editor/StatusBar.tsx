@@ -2,10 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-export default function StatusBar(
-  { markdownText, editStatus, getCaretPosition, getLineAndColumn },
-) {
-  // Get line and column position
+interface StatusBarProps {
+  markdownText: string;
+  editStatus: "editing" | "saved";
+  getLineAndColumn?: () => { line: number; column: number };
+}
+
+export default function StatusBar({
+  markdownText,
+  editStatus,
+  getLineAndColumn,
+}: StatusBarProps) {
   const { line, column } = getLineAndColumn
     ? getLineAndColumn()
     : { line: 1, column: 1 };

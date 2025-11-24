@@ -1,7 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FaChevronRight } from "react-icons/fa";
+
+export interface MenuItem {
+  label?: string;
+  onClick?: () => void;
+  submenu?: MenuItem[];
+  shortcut?: string;
+  divider?: boolean;
+  disabled?: boolean;
+  icon?: ReactNode;
+}
+
+type MenuPosition =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right"
+  | "right-aligned";
 
 /**
  * A Mac-style dropdown menu component
@@ -15,22 +38,26 @@ import { FaChevronRight } from "react-icons/fa";
  * @param {boolean} props.isOpen - Whether the menu is currently open
  * @param {Function} props.onClose - Function to call when the menu should close
  * @param {string} props.position - Position of the menu ("top-left", "top-right", etc.)
- * @param {Object} props.parentRect - Optional bounding client rect of parent menu item (for submenus)
  */
+interface MacStyleMenuProps {
+  items: MenuItem[];
+  isOpen: boolean;
+  onClose: () => void;
+  position?: MenuPosition;
+}
+
 const MacStyleMenu = ({
   items,
   isOpen,
   onClose,
   position = "top-left",
-  parentRect = null,
-}) => {
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const [submenuRects, setSubmenuRects] = useState({});
-  const menuRef = useRef(null);
-  const menuItemRefs = useRef([]);
+}: MacStyleMenuProps) => {
+  const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuItemRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   // Calculate position styles based on the position prop
-  const getPositionStyles = () => {
+  const getPositionStyles = (): CSSProperties => {
     switch (position) {
       case "top-left":
         return { top: "100%", left: "0" };
@@ -49,8 +76,12 @@ const MacStyleMenu = ({
 
   // Handle clicking outside the menu to close it
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        !menuRef.current.contains(event.target)
+      ) {
         onClose();
       }
     };
@@ -66,7 +97,7 @@ const MacStyleMenu = ({
 
   // Close menu on ESC key press
   useEffect(() => {
-    const handleEscKey = (event) => {
+    const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
       }
@@ -81,21 +112,8 @@ const MacStyleMenu = ({
     };
   }, [isOpen, onClose]);
 
-  // Calculate submenu position and store bounding rects
-  useEffect(() => {
-    if (isOpen && menuItemRefs.current.length) {
-      const newRects = {};
-      menuItemRefs.current.forEach((ref, index) => {
-        if (ref) {
-          newRects[index] = ref.getBoundingClientRect();
-        }
-      });
-      setSubmenuRects(newRects);
-    }
-  }, [isOpen, items]);
-
   // Handle menu item click
-  const handleItemClick = (item) => {
+  const handleItemClick = (item: MenuItem) => {
     if (item.onClick && !item.submenu) {
       item.onClick();
       onClose();
@@ -103,7 +121,7 @@ const MacStyleMenu = ({
   };
 
   // Handle hovering over an item with a submenu
-  const handleItemHover = (index) => {
+  const handleItemHover = (index: number) => {
     const item = items[index];
     if (item && item.submenu) {
       setActiveSubmenu(index);
@@ -113,17 +131,7 @@ const MacStyleMenu = ({
   };
 
   // Helper function to check if submenu would go off screen
-  const getSubmenuPosition = (index) => {
-    const rect = submenuRects[index];
-
-    if (!rect) {
-      return {
-        top: menuItemRefs.current[index]?.offsetTop || 0,
-        left: "100%",
-        marginLeft: "2px",
-      };
-    }
-
+  const getSubmenuPosition = (index: number): CSSProperties => {
     // Get menu's offset from the parent
     const menuRect = menuRef.current?.getBoundingClientRect();
 
@@ -132,9 +140,9 @@ const MacStyleMenu = ({
     const estimatedSubmenuWidth = 200; // Approximate width of submenu
     const rightSpace = viewportWidth - (menuRect?.right || 0);
 
-    // If not enough space on right, position submenu to the left
-    const position = {};
-    position.top = menuItemRefs.current[index]?.offsetTop || 0;
+    const position: CSSProperties = {
+      top: menuItemRefs.current[index]?.offsetTop || 0,
+    };
 
     if (rightSpace < estimatedSubmenuWidth) {
       position.right = "100%";
@@ -162,7 +170,9 @@ const MacStyleMenu = ({
           <div key={`menu-item-${index}`}>
             {/* Menu Item */}
             <div
-              ref={(el) => menuItemRefs.current[index] = el}
+              ref={(el) => {
+                menuItemRefs.current[index] = el;
+              }}
               className={`px-4 py-1.5 flex items-center justify-between text-sm ${
                 item.disabled
                   ? "text-neutral-500 cursor-not-allowed"
@@ -195,11 +205,10 @@ const MacStyleMenu = ({
                 style={getSubmenuPosition(index)}
               >
                 <MacStyleMenu
-                  items={item.submenu}
+                  items={item.submenu ?? []}
                   isOpen
                   onClose={onClose}
                   position="right-aligned"
-                  parentRect={submenuRects[index]}
                 />
               </div>
             )}

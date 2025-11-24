@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,11 +12,11 @@ import {
   Save,
   X,
 } from "lucide-react";
-import MenuButton from "../ui/MenuButton.jsx";
-import WelcomeModal from "../modals/WelcomeModal.jsx";
-import VersionControls from "../documents/VersionControls.jsx";
-import ThemeToggle from "../ui/ThemeToggle.jsx";
-import FileSidebar from "../sidebar/FileSidebar.jsx";
+import MenuButton from "../ui/MenuButton.tsx";
+import WelcomeModal from "../modals/WelcomeModal.tsx";
+import VersionControls from "../documents/VersionControls.tsx";
+import ThemeToggle from "../ui/ThemeToggle.tsx";
+import FileSidebar from "../sidebar/FileSidebar.tsx";
 
 // Define menu configurations
 const fileMenuItems = [

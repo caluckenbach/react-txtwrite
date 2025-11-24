@@ -3,7 +3,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText } from "lucide-react";
 
 const WelcomeModal = () => {
   const [isVisible, setIsVisible] = useState(false);

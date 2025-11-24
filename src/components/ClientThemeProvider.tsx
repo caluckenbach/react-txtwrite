@@ -1,9 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { ThemeProvider } from "../contexts/ThemeContext.jsx";
+import { type ReactNode, useEffect, useState } from "react";
+import { ThemeProvider } from "../contexts/ThemeContext.tsx";
 
-export default function ClientThemeProvider({ children }) {
+interface ClientThemeProviderProps {
+  children: ReactNode;
+}
+
+export default function ClientThemeProvider(
+  { children }: ClientThemeProviderProps,
+) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

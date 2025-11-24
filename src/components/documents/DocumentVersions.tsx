@@ -9,16 +9,26 @@ import {
   RotateCcw,
   X,
 } from "lucide-react";
+import type { DocumentVersion } from "../../types/documents.ts";
+
+interface DocumentVersionsProps {
+  documentId: string | null;
+  currentVersion: number;
+  getVersions: (documentId: string) => DocumentVersion[];
+  restoreVersion: (versionId: string) => boolean | void;
+}
 
 export default function DocumentVersions({
   documentId,
   currentVersion,
   getVersions,
   restoreVersion,
-}) {
+}: DocumentVersionsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [versions, setVersions] = useState([]);
-  const [confirmingVersion, setConfirmingVersion] = useState(null);
+  const [versions, setVersions] = useState<DocumentVersion[]>([]);
+  const [confirmingVersion, setConfirmingVersion] = useState<
+    DocumentVersion | null
+  >(null);
 
   useEffect(() => {
     if (documentId && isOpen) {
@@ -27,7 +37,7 @@ export default function DocumentVersions({
     }
   }, [documentId, isOpen, getVersions]);
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -37,11 +47,11 @@ export default function DocumentVersions({
     }).format(date);
   };
 
-  const handleRestore = (version) => {
+  const handleRestore = (version: DocumentVersion) => {
     setConfirmingVersion(version);
   };
 
-  const confirmRestore = (version) => {
+  const confirmRestore = (version: DocumentVersion) => {
     restoreVersion(version.id);
     setConfirmingVersion(null);
     setIsOpen(false);

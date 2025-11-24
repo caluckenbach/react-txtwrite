@@ -4,13 +4,15 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { indentWithTab } from "@codemirror/commands";
 import { keymap } from "@codemirror/view";
+import type { EditorView, KeyBinding } from "@codemirror/view";
 import {
   defaultHighlightStyle,
   syntaxHighlighting,
 } from "@codemirror/language";
+import type { Extension } from "@codemirror/state";
 
 // Create a custom markdown configuration for CodeMirror
-export function createMarkdownExtensions() {
+export function createMarkdownExtensions(): Extension[] {
   return [
     // Basic markdown support
     markdown({
@@ -26,46 +28,50 @@ export function createMarkdownExtensions() {
     syntaxHighlighting(defaultHighlightStyle),
 
     // Additional keymaps for Markdown shortcuts could be added here
-    keymap.of([
-      // Example: Ctrl+B for bold
-      {
-        key: "Mod-b",
-        run: (view) => {
-          const { from, to } = view.state.selection.main;
-          const selection = view.state.doc.sliceString(from, to);
+    keymap.of(
+      [
+        // Example: Ctrl+B for bold
+        {
+          key: "Mod-b",
+          run: (view: EditorView) => {
+            const { from, to } = view.state.selection.main;
+            const selection = view.state.doc.sliceString(from, to);
 
-          view.dispatch({
-            changes: { from, to, insert: `**${selection}**` },
-            selection: { anchor: from + 2, head: to + 2 },
-          });
+            view.dispatch({
+              changes: { from, to, insert: `**${selection}**` },
+              selection: { anchor: from + 2, head: to + 2 },
+            });
 
-          return true;
+            return true;
+          },
         },
-      },
 
-      // Ctrl+I for italic
-      {
-        key: "Mod-i",
-        run: (view) => {
-          const { from, to } = view.state.selection.main;
-          const selection = view.state.doc.sliceString(from, to);
+        // Ctrl+I for italic
+        {
+          key: "Mod-i",
+          run: (view: EditorView) => {
+            const { from, to } = view.state.selection.main;
+            const selection = view.state.doc.sliceString(from, to);
 
-          view.dispatch({
-            changes: { from, to, insert: `*${selection}*` },
-            selection: { anchor: from + 1, head: to + 1 },
-          });
+            view.dispatch({
+              changes: { from, to, insert: `*${selection}*` },
+              selection: { anchor: from + 1, head: to + 1 },
+            });
 
-          return true;
+            return true;
+          },
         },
-      },
-      // Add more keyboard shortcuts for common Markdown formatting
-    ]),
+        // Add more keyboard shortcuts for common Markdown formatting
+      ] satisfies KeyBinding[],
+    ),
   ];
 }
 
+type ThemeSpec = Record<string, Record<string, string | number>>;
+
 // Create a theme configuration for the editor
-export function createEditorTheme(isDarkMode = false) {
-  const theme = {
+export function createEditorTheme(isDarkMode = false): ThemeSpec {
+  const theme: ThemeSpec = {
     "&": {
       fontSize: "14px",
       fontFamily: "var(--font-berkley-mono), monospace",

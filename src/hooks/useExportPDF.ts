@@ -3,18 +3,44 @@
 import { useCallback } from "react";
 import { marked } from "marked";
 
+type Html2Pdf = typeof import("html2pdf.js");
+
+interface ExportOptions {
+  margin: [number, number];
+  filename: string;
+  image: {
+    type: string;
+    quality: number;
+  };
+  html2canvas: {
+    scale: number;
+    useCORS: boolean;
+  };
+  jsPDF: {
+    unit: string;
+    format: string;
+    orientation: "portrait" | "landscape";
+  };
+}
+
 export default function useExportPDF() {
   const exportAsPDF = useCallback(
-    async (markdownContent, fileName = "document.pdf") => {
+    async (markdownContent: string, fileName = "document.pdf") => {
+      let tempDiv: HTMLDivElement | null = null;
       try {
         // Dynamically import html2pdf only in the browser
-        const html2pdf = (await import("html2pdf.js")).default;
+        const html2pdfModule: Html2Pdf = await import("html2pdf.js");
+        const html2pdf = html2pdfModule.default;
+
+        if (!html2pdf) {
+          throw new Error("html2pdf failed to load");
+        }
 
         // Convert markdown to HTML first
-        const htmlContent = marked(markdownContent);
+        const htmlContent = await marked.parse(markdownContent);
 
         // Create a temporary div to hold the content
-        const tempDiv = document.createElement("div");
+        tempDiv = document.createElement("div");
         tempDiv.className = "markdown-export";
         tempDiv.innerHTML = htmlContent;
 
@@ -68,7 +94,7 @@ export default function useExportPDF() {
         document.body.appendChild(tempDiv);
 
         // Configure html2pdf options
-        const options = {
+        const options: ExportOptions = {
           margin: [15, 15],
           filename: fileName,
           image: { type: "jpeg", quality: 0.98 },
@@ -77,21 +103,15 @@ export default function useExportPDF() {
         };
 
         // Generate PDF
-        html2pdf()
-          .set(options)
-          .from(tempDiv)
-          .save()
-          .then(() => {
-            // Clean up
-            document.body.removeChild(tempDiv);
-          })
-          .catch((error) => {
-            console.error("Error generating PDF:", error);
-            document.body.removeChild(tempDiv);
-          });
+        await html2pdf().set(options).from(tempDiv).save();
+        document.body.removeChild(tempDiv);
       } catch (error) {
         console.error("Error during PDF export:", error);
         alert("Could not generate PDF. Please try again.");
+      } finally {
+        if (tempDiv && document.body.contains(tempDiv)) {
+          document.body.removeChild(tempDiv);
+        }
       }
     },
     [],

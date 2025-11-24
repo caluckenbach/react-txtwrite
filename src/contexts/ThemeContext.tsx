@@ -1,16 +1,31 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-const ThemeContext = createContext(undefined);
+type Theme = "light" | "dark";
 
-const getInitialTheme = () => {
+interface ThemeContextValue {
+  theme: Theme;
+  resolvedTheme: Theme;
+  setTheme: (value: Theme) => void;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+
+const getInitialTheme = (): Theme => {
   if (typeof window === "undefined") {
     return "dark";
   }
 
-  const storedTheme = globalThis.localStorage.getItem("theme");
-  if (storedTheme) {
+  const storedTheme = globalThis.localStorage.getItem("theme") as Theme | null;
+  if (storedTheme === "light" || storedTheme === "dark") {
     return storedTheme;
   }
 
@@ -19,8 +34,12 @@ const getInitialTheme = () => {
     : "light";
 };
 
-export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(getInitialTheme);
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -32,7 +51,7 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
-    const handlePreferenceChange = (event) => {
+    const handlePreferenceChange = (event: MediaQueryListEvent) => {
       const storedTheme = globalThis.localStorage.getItem("theme");
       if (!storedTheme) {
         setThemeState(event.matches ? "dark" : "light");
@@ -48,7 +67,7 @@ export function ThemeProvider({ children }) {
     setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
-  const setTheme = (value) => setThemeState(value);
+  const setTheme = (value: Theme) => setThemeState(value);
 
   return (
     <ThemeContext.Provider
@@ -59,7 +78,7 @@ export function ThemeProvider({ children }) {
   );
 }
 
-export function useTheme() {
+export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");

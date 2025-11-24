@@ -2,14 +2,23 @@
 
 import { useState } from "react";
 import { History, Save } from "lucide-react";
-import DocumentVersions from "./DocumentVersions.jsx";
-import VersionHistoryModal from "../modals/VersionHistoryModal.jsx";
+import DocumentVersions from "./DocumentVersions.tsx";
+import VersionHistoryModal from "../modals/VersionHistoryModal.tsx";
+import type { DocumentRecord } from "../../types/documents.ts";
+
+interface VersionControlsProps {
+  document: DocumentRecord | null;
+  getVersions: (documentId: string) => DocumentVersion[];
+  restoreVersion: (versionId: string) => boolean | void;
+}
+
+import type { DocumentVersion } from "../../types/documents.ts";
 
 export default function VersionControls({
   document,
   getVersions,
   restoreVersion,
-}) {
+}: VersionControlsProps) {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
 
   if (!document) return null;

@@ -1,10 +1,41 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import type { DocumentTab } from "../../types/documents.ts";
+
+type ScrollDirection = "left" | "right";
+
+interface DocumentTabsProps {
+  documentTabs: DocumentTab[];
+  activeDocumentId: string | null;
+  handleDocumentChange: (documentId: string) => void;
+  closeDocumentTab: (
+    event: MouseEvent<HTMLElement>,
+    documentId: string,
+  ) => void;
+  createNewDocument: () => void;
+  editingTitleId: string | null;
+  editingTitleValue: string;
+  setEditingTitleValue: (value: string) => void;
+  startEditingTitle: (
+    event: MouseEvent<HTMLSpanElement>,
+    documentId: string,
+    currentTitle: string,
+  ) => void;
+  saveEditedTitle: () => void;
+  titleInputRef: RefObject<HTMLInputElement>;
+  handleTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+}
 
 export default function DocumentTabs({
-  documents,
   documentTabs,
   activeDocumentId,
   handleDocumentChange,
@@ -17,9 +48,9 @@ export default function DocumentTabs({
   saveEditedTitle,
   titleInputRef,
   handleTitleKeyDown,
-}) {
-  const fileTabsRef = useRef(null);
-  const mobileTabsRef = useRef(null);
+}: DocumentTabsProps) {
+  const fileTabsRef = useRef<HTMLDivElement | null>(null);
+  const mobileTabsRef = useRef<HTMLDivElement | null>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const [mobileLeftArrow, setMobileLeftArrow] = useState(false);
@@ -38,7 +69,10 @@ export default function DocumentTabs({
 
     // Calculate total width of all tabs
     const totalContentWidth = Array.from(tabsContainer.children)
-      .reduce((total, element) => total + element.offsetWidth, 0);
+      .reduce(
+        (total, element) => total + (element as HTMLElement).offsetWidth,
+        0,
+      );
 
     // Add margin/gap between items (gap-x-2 = 0.5rem = ~8px)
     const gapWidth = (documentTabs.length + 1) * 8; // +1 for the "New Document" button
@@ -85,7 +119,7 @@ export default function DocumentTabs({
   }, [documentTabs.length]);
 
   // Scroll tabs with buttons
-  const scrollTabs = (direction, isMobile = false) => {
+  const scrollTabs = (direction: ScrollDirection, isMobile = false) => {
     const ref = isMobile ? mobileTabsRef : fileTabsRef;
     if (!ref.current) return;
 
@@ -125,7 +159,7 @@ export default function DocumentTabs({
   }, [activeDocumentId]);
 
   // Handle document change with safety measures
-  const handleDocTabChange = (docId) => {
+  const handleDocTabChange = (docId: string) => {
     if (operationInProgress || docId === activeDocumentId) return;
 
     setOperationInProgress(true);
@@ -142,7 +176,10 @@ export default function DocumentTabs({
   };
 
   // Handle document tab close with safety measures
-  const handleCloseTab = (e, docId) => {
+  const handleCloseTab = (
+    e: MouseEvent<HTMLElement>,
+    docId: string,
+  ) => {
     if (operationInProgress) return;
 
     setOperationInProgress(true);
@@ -159,7 +196,7 @@ export default function DocumentTabs({
   };
 
   // Handle new document creation with safety measures
-  const handleCreateNewDocument = (e) => {
+  const handleCreateNewDocument = (e: MouseEvent<HTMLDivElement>) => {
     if (operationInProgress) return;
 
     e.preventDefault();
@@ -174,17 +211,6 @@ export default function DocumentTabs({
         setOperationInProgress(false);
       }, 300);
     }, 50);
-  };
-
-  // Function to get document title from id
-  const getDocumentTitle = (docId) => {
-    // First look in documentTabs
-    const tab = documentTabs.find((tab) => tab.id === docId);
-    if (tab) return tab.title;
-
-    // If not found, look in documents
-    const doc = documents.find((doc) => doc.id === docId);
-    return doc ? doc.title : "Untitled";
   };
 
   return (

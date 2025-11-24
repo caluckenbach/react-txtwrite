@@ -1,13 +1,13 @@
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, type Extension } from "@codemirror/state";
 import {
   EditorView,
-  highlightActiveLine,
   highlightActiveLineGutter,
   keymap,
   lineNumbers,
 } from "@codemirror/view";
+import type { KeyBinding } from "@codemirror/view";
 import {
   defaultKeymap,
   history,
@@ -58,11 +58,11 @@ export const darkTheme = EditorView.theme({});
 
 // Performance optimizations - we create this once and reuse
 const createFormattingKeymap = (() => {
-  const keymap = [
+  const formattingBindings: KeyBinding[] = [
     // Bold: Ctrl/Cmd + B
     {
       key: "Mod-b",
-      run: (view) => {
+      run: (view: EditorView) => {
         const { state, dispatch } = view;
         const selection = state.selection.main;
         const selectedText = state.sliceDoc(selection.from, selection.to);
@@ -98,7 +98,7 @@ const createFormattingKeymap = (() => {
     // Italic: Ctrl/Cmd + I
     {
       key: "Mod-i",
-      run: (view) => {
+      run: (view: EditorView) => {
         const { state, dispatch } = view;
         const selection = state.selection.main;
         const selectedText = state.sliceDoc(selection.from, selection.to);
@@ -134,7 +134,7 @@ const createFormattingKeymap = (() => {
     // Link: Ctrl/Cmd + K
     {
       key: "Mod-k",
-      run: (view) => {
+      run: (view: EditorView) => {
         const { state, dispatch } = view;
         const selection = state.selection.main;
         const selectedText = state.sliceDoc(selection.from, selection.to);
@@ -165,13 +165,16 @@ const createFormattingKeymap = (() => {
     },
   ];
 
-  return () => keymap;
+  return () => formattingBindings;
 })();
 
 // Debounce helper for scroll events
-function debounce(fn, delay) {
-  let timer = null;
-  return function (...args) {
+function debounce<T extends (...args: any[]) => void>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       fn(...args);
@@ -181,59 +184,23 @@ function debounce(fn, delay) {
 }
 
 // Constants for typing behavior tuning
-const TYPING_DEBOUNCE_TIME = 20; // ms - short debounce for smoother typing
-const UPDATE_INTERVAL_MIN = 50; // ms - minimum time between updates during rapid typing
 const SCROLL_DEBOUNCE_TIME = 1; // ms - scroll events debounce
 
+type ScrollHandler = (percentage: number) => void;
+type DocChangeHandler = (value: string) => void;
+
 // Base CodeMirror setup with Markdown support
-export const createMarkdownExtensions = (isDarkMode, onDocChange, onScroll) => {
+export const createMarkdownExtensions = (
+  isDarkMode: boolean,
+  onDocChange?: DocChangeHandler,
+  onScroll?: ScrollHandler,
+): Extension[] => {
   // Create debounced version of scroll handler
   const debouncedScroll = onScroll
-    ? debounce((percentage) => {
+    ? debounce((percentage: number) => {
       onScroll(percentage);
     }, SCROLL_DEBOUNCE_TIME)
     : null;
-
-  // Create debounced version of docChange handler
-  const debouncedDocChange = onDocChange
-    ? debounce((text) => {
-      onDocChange(text);
-    }, TYPING_DEBOUNCE_TIME)
-    : null;
-
-  // Track typing activity to optimize update frequency
-  let lastUpdateTime = 0;
-  let pendingText = null;
-  let updateScheduled = false;
-
-  // Intelligent update scheduler
-  const scheduleUpdate = (text) => {
-    pendingText = text;
-
-    if (updateScheduled) return;
-    updateScheduled = true;
-
-    const now = Date.now();
-    const timeSinceUpdate = now - lastUpdateTime;
-
-    if (timeSinceUpdate < UPDATE_INTERVAL_MIN) {
-      // Too soon for another update - schedule one for later
-      setTimeout(() => {
-        updateScheduled = false;
-        lastUpdateTime = Date.now();
-        if (pendingText !== null) {
-          onDocChange(pendingText);
-          pendingText = null;
-        }
-      }, UPDATE_INTERVAL_MIN - timeSinceUpdate);
-    } else {
-      // Enough time has passed - update now
-      updateScheduled = false;
-      lastUpdateTime = now;
-      onDocChange(text);
-      pendingText = null;
-    }
-  };
 
   return [
     lineNumbers(),
@@ -264,7 +231,7 @@ export const createMarkdownExtensions = (isDarkMode, onDocChange, onScroll) => {
     }),
 
     EditorView.domEventHandlers({
-      scroll(event, view) {
+      scroll(_event, view) {
         if (debouncedScroll) {
           const { scrollTop, scrollHeight, clientHeight } = view.scrollDOM;
           const percentage = scrollTop / (scrollHeight - clientHeight || 1);
@@ -277,7 +244,10 @@ export const createMarkdownExtensions = (isDarkMode, onDocChange, onScroll) => {
 };
 
 // Create an initial editor state
-export const createEditorState = (initialContent, extensions) => {
+export const createEditorState = (
+  initialContent: string,
+  extensions: Extension[],
+): EditorState => {
   return EditorState.create({
     doc: initialContent,
     extensions,

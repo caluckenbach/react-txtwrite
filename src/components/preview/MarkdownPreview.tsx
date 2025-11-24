@@ -1,43 +1,53 @@
 // Optimized MarkdownPreview.js
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  type ReactNode,
+  type RefObject,
+  type UIEventHandler,
+  useEffect,
+  useState,
+} from "react";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkReact from "remark-react";
 import { unified } from "unified";
 import "../../markdown-styles.css";
 
-// Create processor once outside component
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
+  // @ts-ignore - remark-react typings are not compatible with unified@11 yet
   .use(remarkReact, {
     createElement: React.createElement,
   });
+
+interface MarkdownPreviewProps {
+  markdownText: string;
+  previewRef: RefObject<HTMLDivElement>;
+  handlePreviewScroll: UIEventHandler<HTMLDivElement>;
+  isMobile?: boolean;
+}
 
 export default function MarkdownPreview({
   markdownText,
   previewRef,
   handlePreviewScroll,
-  isMobile,
-}) {
-  const [content, setContent] = useState(null);
+  isMobile: _isMobile, // reserved for future responsive tweaks
+}: MarkdownPreviewProps) {
+  const [content, setContent] = useState<ReactNode>(null);
 
-  // Process content immediately when markdownText changes
   useEffect(() => {
-    // Use a higher priority microtask to process markdown faster
     const processMarkdown = async () => {
       try {
         const file = await processor.process(markdownText);
-        setContent(file.result);
+        setContent(file.result as ReactNode);
       } catch (error) {
         console.error("Error processing markdown:", error);
         setContent(<div>Error rendering markdown</div>);
       }
     };
 
-    // Use Promise.resolve().then for microtask queue priority
     Promise.resolve().then(processMarkdown);
   }, [markdownText]);
 

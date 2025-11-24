@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -8,7 +9,7 @@ import {
   darkTheme,
   lightTheme,
   themeCompartment,
-} from "./CodeMirrorSetup.js";
+} from "./CodeMirrorSetup.ts";
 import {
   FaBold,
   FaCheckSquare,

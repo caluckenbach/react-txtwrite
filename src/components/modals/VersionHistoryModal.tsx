@@ -2,7 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Clock, X } from "lucide-react";
-import VersionHistory from "../documents/VersionHistory.jsx";
+import VersionHistory from "../documents/VersionHistory.tsx";
+import type { DocumentVersion } from "../../types/documents.ts";
+
+interface VersionHistoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  documentId: string | null;
+  currentVersion: number;
+  getVersions: (documentId: string) => DocumentVersion[];
+  restoreVersion: (versionId: string) => boolean | void;
+}
 
 export default function VersionHistoryModal({
   isOpen,
@@ -11,8 +21,8 @@ export default function VersionHistoryModal({
   currentVersion,
   getVersions,
   restoreVersion,
-}) {
-  const drawerRef = useRef(null);
+}: VersionHistoryModalProps) {
+  const drawerRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   // Handle animation and visibility
@@ -46,8 +56,12 @@ export default function VersionHistoryModal({
 
   // Handle clicks outside the drawer to close it
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (drawerRef.current && !drawerRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        drawerRef.current &&
+        event.target instanceof Node &&
+        !drawerRef.current.contains(event.target)
+      ) {
         onClose();
       }
     };
@@ -63,7 +77,7 @@ export default function VersionHistoryModal({
 
   // Handle escape key
   useEffect(() => {
-    const handleEscapeKey = (event) => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
       }

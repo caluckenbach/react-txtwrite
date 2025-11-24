@@ -1,12 +1,12 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from "react";
-import DashboardLayout from "./components/layout/DashboardLayout.jsx";
-import DocumentTabs from "./components/documents/DocumentTabs.jsx";
-import CodeMirrorEditor from "./components/editor/CodeMirrorEditor.jsx";
-import MarkdownPreview from "./components/preview/MarkdownPreview.jsx";
-import StatusBar from "./components/editor/StatusBar.jsx";
-import useDocuments from "./hooks/useDocuments.js";
-import { useTheme } from "./contexts/ThemeContext.jsx";
+import DashboardLayout from "./components/layout/DashboardLayout.tsx";
+import DocumentTabs from "./components/documents/DocumentTabs.tsx";
+import CodeMirrorEditor from "./components/editor/CodeMirrorEditor.tsx";
+import MarkdownPreview from "./components/preview/MarkdownPreview.tsx";
+import StatusBar from "./components/editor/StatusBar.tsx";
+import useDocuments from "./hooks/useDocuments.ts";
+import { useTheme } from "./contexts/ThemeContext.tsx";
 
 export default function App() {
   const [markdownText, setMarkdownText] = useState("# Loading...");

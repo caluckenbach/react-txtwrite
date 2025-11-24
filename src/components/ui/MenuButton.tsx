@@ -1,20 +1,28 @@
 "use client";
 
 import { useRef, useState } from "react";
-import MacStyleMenu from "./MacStyleMenu.jsx";
+import MacStyleMenu, { type MenuItem } from "./MacStyleMenu.tsx";
 
-/**
- * A button that triggers a Mac-style dropdown menu
- * @param {Object} props
- * @param {string} props.label - Text to display on the button
- * @param {Object[]} props.menuItems - Array of menu items to pass to MacStyleMenu
- * @param {string} props.position - Position of the menu relative to the button
- */
-const MenuButton = (
-  { label, menuItems, position = "top-left", className = "" },
-) => {
+interface MenuButtonProps {
+  label: string;
+  menuItems: MenuItem[];
+  position?:
+    | "top-left"
+    | "top-right"
+    | "bottom-left"
+    | "bottom-right"
+    | "right-aligned";
+  className?: string;
+}
+
+const MenuButton = ({
+  label,
+  menuItems,
+  position = "top-left",
+  className = "",
+}: MenuButtonProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -28,7 +36,7 @@ const MenuButton = (
     <div className="relative inline-block">
       <button
         ref={buttonRef}
-        className={`${className}`}
+        className={className}
         onClick={toggleMenu}
         aria-haspopup="true"
         aria-expanded={isMenuOpen}

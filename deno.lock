@@ -58,6 +58,7 @@
     "npm:rolldown-vite@7.2.5": "7.2.5_@types+node@24.10.1_picomatch@4.0.3",
     "npm:tailwindcss@^4.1.17": "4.1.17",
     "npm:three@0.174": "0.174.0",
+    "npm:tsc@*": "2.0.4",
     "npm:typescript-eslint@^8.46.4": "8.47.0_eslint@9.39.1_typescript@5.9.3_@typescript-eslint+parser@8.47.0__eslint@9.39.1__typescript@5.9.3",
     "npm:typescript@~5.9.3": "5.9.3",
     "npm:unified@^11.0.5": "11.0.5",
@@ -3803,6 +3804,10 @@
       "dependencies": [
         "typescript"
       ]
+    },
+    "tsc@2.0.4": {
+      "integrity": "sha512-fzoSieZI5KKJVBYGvwbVZs/J5za84f2lSTLPYf6AGiIf43tZ3GNrI1QzTLcjtyDDP4aLxd46RTZq1nQxe7+k5Q==",
+      "bin": true
     },
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
