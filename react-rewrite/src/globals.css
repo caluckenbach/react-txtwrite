@@ -4,6 +4,12 @@
 @import './markdown-styles.css';
 @custom-variant dark (&:where(.dark, .dark *));
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 @theme {
   --color-brand-dark: oklch(0.22 0 0);
   --color-brand-light: oklch(0.97 0 0);
