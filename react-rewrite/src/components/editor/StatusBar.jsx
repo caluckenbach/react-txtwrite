@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ThemeToggle from '../ui/ThemeToggle';
 
 export default function StatusBar({ markdownText, editStatus, getCaretPosition, getLineAndColumn }) {
     // Get line and column position

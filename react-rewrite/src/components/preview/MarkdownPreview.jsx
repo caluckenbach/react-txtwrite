@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkReact from 'remark-react';
 import { unified } from 'unified';
-import '../../app/markdown-styles.css';
+import '../../markdown-styles.css';
 
 // Create processor once outside component
 const processor = unified()

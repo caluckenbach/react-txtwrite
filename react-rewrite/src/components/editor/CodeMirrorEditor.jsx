@@ -6,7 +6,6 @@ import { EditorState } from '@codemirror/state';
 import {
     createMarkdownExtensions,
     themeCompartment,
-    guttersCompartment,
     lightTheme,
     darkTheme,
 } from './CodeMirrorSetup';

@@ -1,73 +1,23 @@
-# React + TypeScript + Vite
+# TXTWrite React Rewrite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This package is a Vite-powered, fully client-side rewrite of TXTWrite that removes the Next.js dependency. The editor, preview, document management, and file sidebar logic from `src/` have been copied over so everything runs locally with zero server calls or SaaS integrations.
 
-Currently, two official plugins are available:
+## Getting Started (Deno)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd react-rewrite
+deno task dev        # Start Vite dev server
+deno task build      # Type-check + build for production
+deno task preview    # Preview the production build
+deno task lint       # Run eslint over the project
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Deno reads `package.json`/`deno.lock` to install the npm dependencies automatically, so `deno task dev` is all you need after cloning.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Project Notes
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- All UI, hooks, utils, and styles were brought over from the original Next app and still live under `src/`.
+- `@/` path aliases are configured in both `tsconfig*.json` and `vite.config.ts`.
+- Tailwind 4 and the project-specific global styles (`globals.css`, CodeMirror, markdown, toolbar) are imported once in `src/main.tsx`.
+- Theme toggling is handled locally via `src/contexts/ThemeContext.js`, mirroring the old `next-themes` behavior.
+- The app only uses `localStorage` for persistence, so it’s safe to run completely offline. Notion, Stripe, and other remote integrations have been removed.

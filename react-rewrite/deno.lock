@@ -58,7 +58,8 @@
     "npm:three@0.174": "0.174.0",
     "npm:typescript-eslint@^8.46.4": "8.47.0_eslint@9.39.1_typescript@5.9.3_@typescript-eslint+parser@8.47.0__eslint@9.39.1__typescript@5.9.3",
     "npm:typescript@~5.9.3": "5.9.3",
-    "npm:unified@^11.0.5": "11.0.5"
+    "npm:unified@^11.0.5": "11.0.5",
+    "npm:vite@*": "7.2.4_@types+node@24.10.1_picomatch@4.0.3"
   },
   "npm": {
     "@alloc/quick-lru@5.2.0": {
