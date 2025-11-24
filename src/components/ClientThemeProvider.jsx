@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { ThemeProvider } from '../contexts/ThemeContext.jsx';
+import React, { useEffect, useState } from "react";
+import { ThemeProvider } from "../contexts/ThemeContext.jsx";
 
 export default function ClientThemeProvider({ children }) {
-    const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    if (!mounted) {
-        return (
-            <div style={{ visibility: 'hidden' }}>
-                {children}
-            </div>
-        );
-    }
+  if (!mounted) {
+    return (
+      <div style={{ visibility: "hidden" }}>
+        {children}
+      </div>
+    );
+  }
 
-    return <ThemeProvider>{children}</ThemeProvider>;
+  return <ThemeProvider>{children}</ThemeProvider>;
 }

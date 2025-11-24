@@ -1,26 +1,31 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { saveDocumentVersion, getDocumentVersions, restoreDocumentVersion } from '../utils/documentVersioning.js';
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  getDocumentVersions,
+  restoreDocumentVersion,
+  saveDocumentVersion,
+} from "../utils/documentVersioning.js";
 
 // File system constants
-const FILE_SYSTEM_KEY = 'txtwFileSystem';
-const DOCUMENT_TABS_KEY = 'documentTabs';
+const FILE_SYSTEM_KEY = "txtwFileSystem";
+const DOCUMENT_TABS_KEY = "documentTabs";
 
 // Document structure
 const createEmptyDocument = (id) => {
   const now = new Date().toISOString();
   return {
     id: id || crypto.randomUUID(),
-    user_id: 'current-user',
+    user_id: "current-user",
     uuid: crypto.randomUUID(),
-    title: 'New Document',
-    content: '# New Document\n\nStart typing here...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+    title: "New Document",
+    content:
+      "# New Document\n\nStart typing here...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
     version: 1,
     is_published: false,
     created_at: now,
     updated_at: now,
     last_synced_at: now,
     metadata: {},
-    folder_id: 'default'
+    folder_id: "default",
   };
 };
 
@@ -29,13 +34,13 @@ export default function useDocuments(markdownText, setMarkdownText) {
   const [activeDocumentId, setActiveDocumentId] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [editingTitleId, setEditingTitleId] = useState(null);
-  const [editingTitleValue, setEditingTitleValue] = useState('');
+  const [editingTitleValue, setEditingTitleValue] = useState("");
   const [fileSystem, setFileSystem] = useState([]);
   const [documentTabs, setDocumentTabs] = useState([]);
 
   // Refs for stable references across renders
   const titleInputRef = useRef(null);
-  const currentContentRef = useRef('');
+  const currentContentRef = useRef("");
   const documentsRef = useRef([]);
   const activeDocumentIdRef = useRef(null);
   const fileSystemRef = useRef([]);
@@ -114,7 +119,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
     try {
       // Get documents directly from localStorage for the most up-to-date state
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
       if (docsString) {
         currentDocs = JSON.parse(docsString);
@@ -123,19 +128,19 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Update the document in our state
-      const updatedDocs = currentDocs.map(doc => {
+      const updatedDocs = currentDocs.map((doc) => {
         if (doc.id === activeDocumentIdRef.current) {
           return {
             ...doc,
             content: text,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           };
         }
         return doc;
       });
 
       // Save all documents to localStorage
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Use a functional update to avoid closure issues
       setDocuments(updatedDocs);
@@ -143,7 +148,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
       return true;
     } catch (error) {
-      console.error('Error in synchronous save:', error);
+      console.error("Error in synchronous save:", error);
       return false;
     }
   };
@@ -151,23 +156,28 @@ export default function useDocuments(markdownText, setMarkdownText) {
   // Load document content when active document changes
   useEffect(() => {
     if (activeDocumentId && documents.length > 0) {
-      const doc = documents.find(d => d.id === activeDocumentId);
+      const doc = documents.find((d) => d.id === activeDocumentId);
       if (doc) {
         // Immediately update the editor content
         setMarkdownText(doc.content);
         currentContentRef.current = doc.content;
 
         // Notify layout component about the document change
-        globalThis.dispatchEvent(new CustomEvent('active-document-changed', {
-          detail: { document: doc }
-        }));
+        globalThis.dispatchEvent(
+          new CustomEvent("active-document-changed", {
+            detail: { document: doc },
+          }),
+        );
 
         // Save as last active document
-        localStorage.setItem('lastActiveDocument', activeDocumentId);
+        localStorage.setItem("lastActiveDocument", activeDocumentId);
 
         // Add to document tabs if not already there
-        if (!documentTabs.some(tab => tab.id === activeDocumentId)) {
-          const updatedTabs = [...documentTabs, { id: activeDocumentId, title: doc.title }];
+        if (!documentTabs.some((tab) => tab.id === activeDocumentId)) {
+          const updatedTabs = [...documentTabs, {
+            id: activeDocumentId,
+            title: doc.title,
+          }];
           setDocumentTabs(updatedTabs);
           documentTabsRef.current = updatedTabs;
           localStorage.setItem(DOCUMENT_TABS_KEY, JSON.stringify(updatedTabs));
@@ -185,9 +195,12 @@ export default function useDocuments(markdownText, setMarkdownText) {
       loadDocuments();
     };
 
-    globalThis.addEventListener('documents-updated', handleDocumentsUpdated);
+    globalThis.addEventListener("documents-updated", handleDocumentsUpdated);
     return () => {
-      globalThis.removeEventListener('documents-updated', handleDocumentsUpdated);
+      globalThis.removeEventListener(
+        "documents-updated",
+        handleDocumentsUpdated,
+      );
     };
   }, []);
 
@@ -197,9 +210,15 @@ export default function useDocuments(markdownText, setMarkdownText) {
       createNewDocument();
     };
 
-    globalThis.addEventListener('sidebar-create-document', handleSidebarCreateDocument);
+    globalThis.addEventListener(
+      "sidebar-create-document",
+      handleSidebarCreateDocument,
+    );
     return () => {
-      globalThis.removeEventListener('sidebar-create-document', handleSidebarCreateDocument);
+      globalThis.removeEventListener(
+        "sidebar-create-document",
+        handleSidebarCreateDocument,
+      );
     };
   }, []);
 
@@ -212,9 +231,15 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
     };
 
-    globalThis.addEventListener('sidebar-document-changed', handleSidebarDocumentChanged);
+    globalThis.addEventListener(
+      "sidebar-document-changed",
+      handleSidebarDocumentChanged,
+    );
     return () => {
-      globalThis.removeEventListener('sidebar-document-changed', handleSidebarDocumentChanged);
+      globalThis.removeEventListener(
+        "sidebar-document-changed",
+        handleSidebarDocumentChanged,
+      );
     };
   }, [activeDocumentId]);
 
@@ -227,7 +252,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       if (documentId && documents.length > 0) {
         try {
           // Get documents directly from localStorage for the most up-to-date state
-          const docsString = localStorage.getItem('documents');
+          const docsString = localStorage.getItem("documents");
           let currentDocs = [];
           if (docsString) {
             currentDocs = JSON.parse(docsString);
@@ -235,7 +260,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
             currentDocs = documentsRef.current;
           }
 
-          const updatedDocs = currentDocs.map(doc => {
+          const updatedDocs = currentDocs.map((doc) => {
             if (doc.id === documentId) {
               return { ...doc, title };
             }
@@ -244,10 +269,10 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
           setDocuments(updatedDocs);
           documentsRef.current = updatedDocs;
-          localStorage.setItem('documents', JSON.stringify(updatedDocs));
+          localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
           // Update document tabs
-          const updatedTabs = documentTabsRef.current.map(tab => {
+          const updatedTabs = documentTabsRef.current.map((tab) => {
             if (tab.id === documentId) {
               return { ...tab, title };
             }
@@ -257,17 +282,20 @@ export default function useDocuments(markdownText, setMarkdownText) {
           documentTabsRef.current = updatedTabs;
           localStorage.setItem(DOCUMENT_TABS_KEY, JSON.stringify(updatedTabs));
         } catch (error) {
-          console.error('Error handling title change event:', error);
+          console.error("Error handling title change event:", error);
         }
       }
     };
 
-    globalThis.addEventListener('document-title-changed', handleTitleChange);
-    globalThis.addEventListener('file-title-changed', handleTitleChange);
+    globalThis.addEventListener("document-title-changed", handleTitleChange);
+    globalThis.addEventListener("file-title-changed", handleTitleChange);
 
     return () => {
-      globalThis.removeEventListener('document-title-changed', handleTitleChange);
-      globalThis.removeEventListener('file-title-changed', handleTitleChange);
+      globalThis.removeEventListener(
+        "document-title-changed",
+        handleTitleChange,
+      );
+      globalThis.removeEventListener("file-title-changed", handleTitleChange);
     };
   }, [documents]);
 
@@ -277,7 +305,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       documentOperationInProgress.current = true;
 
       // Load documents
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let docs = [];
 
       if (docsString) {
@@ -286,7 +314,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
         // If no documents exist, create a default one
         const defaultDoc = createEmptyDocument();
         docs = [defaultDoc];
-        localStorage.setItem('documents', JSON.stringify(docs));
+        localStorage.setItem("documents", JSON.stringify(docs));
       }
 
       setDocuments(docs);
@@ -302,11 +330,11 @@ export default function useDocuments(markdownText, setMarkdownText) {
         // Initialize with default structure
         fs = [
           {
-            id: 'folder-1',
-            name: 'My Documents',
-            type: 'folder',
-            children: []
-          }
+            id: "folder-1",
+            name: "My Documents",
+            type: "folder",
+            children: [],
+          },
         ];
         localStorage.setItem(FILE_SYSTEM_KEY, JSON.stringify(fs));
       }
@@ -318,7 +346,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       syncDocumentsWithFileSystem(docs, fs);
 
       // Get last active document from localStorage
-      const lastActiveId = localStorage.getItem('lastActiveDocument');
+      const lastActiveId = localStorage.getItem("lastActiveDocument");
 
       // Load saved document tabs from localStorage
       let savedTabs = [];
@@ -328,19 +356,21 @@ export default function useDocuments(markdownText, setMarkdownText) {
           savedTabs = JSON.parse(tabsString);
 
           // Ensure the tabs reference valid documents
-          savedTabs = savedTabs.filter(tab =>
-            docs.some(doc => doc.id === tab.id)
+          savedTabs = savedTabs.filter((tab) =>
+            docs.some((doc) => doc.id === tab.id)
           );
         }
       } catch (error) {
-        console.error('Error loading saved tabs', error);
+        console.error("Error loading saved tabs", error);
         savedTabs = [];
       }
 
       // If no tabs were saved or the filter removed all tabs, create a default tab
       if (savedTabs.length === 0 && docs.length > 0) {
-        const docToUse = lastActiveId && docs.some(doc => doc.id === lastActiveId)
-          ? docs.find(doc => doc.id === lastActiveId)
+        const docToUse = lastActiveId && docs.some((doc) =>
+            doc.id === lastActiveId
+          )
+          ? docs.find((doc) => doc.id === lastActiveId)
           : docs[0];
 
         savedTabs = [{ id: docToUse.id, title: docToUse.title }];
@@ -351,7 +381,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       documentTabsRef.current = savedTabs;
 
       // Set active document
-      if (lastActiveId && docs.some(doc => doc.id === lastActiveId)) {
+      if (lastActiveId && docs.some((doc) => doc.id === lastActiveId)) {
         setActiveDocumentId(lastActiveId);
         activeDocumentIdRef.current = lastActiveId;
       } else if (savedTabs.length > 0) {
@@ -368,7 +398,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
         documentOperationInProgress.current = false;
       }, 50);
     } catch (error) {
-      console.error('Error loading documents from localStorage:', error);
+      console.error("Error loading documents from localStorage:", error);
 
       // Create a default document if we encounter an error
       const defaultDoc = createEmptyDocument();
@@ -376,21 +406,21 @@ export default function useDocuments(markdownText, setMarkdownText) {
       documentsRef.current = [defaultDoc];
       setActiveDocumentId(defaultDoc.id);
       activeDocumentIdRef.current = defaultDoc.id;
-      localStorage.setItem('documents', JSON.stringify([defaultDoc]));
+      localStorage.setItem("documents", JSON.stringify([defaultDoc]));
 
       // Initialize file system
       const defaultFs = [
         {
-          id: 'folder-1',
-          name: 'My Documents',
-          type: 'folder',
+          id: "folder-1",
+          name: "My Documents",
+          type: "folder",
           children: [{
             id: defaultDoc.id,
-            name: 'New Document.md',
-            type: 'markdown',
-            documentRef: defaultDoc.id
-          }]
-        }
+            name: "New Document.md",
+            type: "markdown",
+            documentRef: defaultDoc.id,
+          }],
+        },
       ];
 
       setFileSystem(defaultFs);
@@ -413,8 +443,8 @@ export default function useDocuments(markdownText, setMarkdownText) {
     const fileIds = new Set();
 
     const collectIds = (items) => {
-      items.forEach(item => {
-        if (item.type !== 'folder' && item.documentRef) {
+      items.forEach((item) => {
+        if (item.type !== "folder" && item.documentRef) {
           fileIds.add(item.documentRef);
         }
         if (item.children) {
@@ -426,42 +456,42 @@ export default function useDocuments(markdownText, setMarkdownText) {
     collectIds(fs);
 
     // Find documents missing from the file system
-    const missingDocs = docs.filter(doc => !fileIds.has(doc.id));
+    const missingDocs = docs.filter((doc) => !fileIds.has(doc.id));
 
     if (missingDocs.length > 0) {
       // Update the file system by adding missing documents
       let updatedFs = [...fs];
 
       // Add missing documents to the first folder
-      const firstFolder = updatedFs.find(item => item.type === 'folder');
+      const firstFolder = updatedFs.find((item) => item.type === "folder");
 
       if (firstFolder) {
         const updatedFolder = {
           ...firstFolder,
           children: [
             ...(firstFolder.children || []),
-            ...missingDocs.map(doc => ({
+            ...missingDocs.map((doc) => ({
               id: doc.id,
               name: `${doc.title}.md`,
-              type: 'markdown',
-              documentRef: doc.id
-            }))
-          ]
+              type: "markdown",
+              documentRef: doc.id,
+            })),
+          ],
         };
 
-        updatedFs = updatedFs.map(item =>
+        updatedFs = updatedFs.map((item) =>
           item.id === firstFolder.id ? updatedFolder : item
         );
       } else {
         // If no folder exists, add documents to root
         updatedFs = [
           ...updatedFs,
-          ...missingDocs.map(doc => ({
+          ...missingDocs.map((doc) => ({
             id: doc.id,
             name: `${doc.title}.md`,
-            type: 'markdown',
-            documentRef: doc.id
-          }))
+            type: "markdown",
+            documentRef: doc.id,
+          })),
         ];
       }
 
@@ -478,7 +508,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
     try {
       // Get documents directly from localStorage for the most up-to-date state
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
       if (docsString) {
         currentDocs = JSON.parse(docsString);
@@ -487,19 +517,19 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Update the document in our state
-      const updatedDocs = currentDocs.map(doc => {
+      const updatedDocs = currentDocs.map((doc) => {
         if (doc.id === activeDocumentIdRef.current) {
           return {
             ...doc,
             content: text,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           };
         }
         return doc;
       });
 
       // Save all documents to localStorage immediately
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Update state with the latest documents
       setDocuments(updatedDocs);
@@ -507,7 +537,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
       return true;
     } catch (error) {
-      console.error('Error in synchronous save:', error);
+      console.error("Error in synchronous save:", error);
       return false;
     }
   }, [setDocuments]);
@@ -518,20 +548,22 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
     try {
       // First get the current document
-      const currentDoc = documentsRef.current.find(doc => doc.id === activeDocumentIdRef.current);
+      const currentDoc = documentsRef.current.find((doc) =>
+        doc.id === activeDocumentIdRef.current
+      );
       if (!currentDoc) return;
 
       // Make sure we're saving the latest content from the editor
       const currentDocWithLatestContent = {
         ...currentDoc,
-        content: currentContentRef.current // Use the latest content from the editor
+        content: currentContentRef.current, // Use the latest content from the editor
       };
 
       // Save the current version before incrementing it
       const updatedDoc = saveDocumentVersion(currentDocWithLatestContent);
 
       // Get latest documents from localStorage
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
       if (docsString) {
         currentDocs = JSON.parse(docsString);
@@ -540,7 +572,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Update document with new version number in our documents array
-      const updatedDocs = currentDocs.map(doc => {
+      const updatedDocs = currentDocs.map((doc) => {
         if (doc.id === activeDocumentIdRef.current) {
           return updatedDoc;
         }
@@ -550,22 +582,26 @@ export default function useDocuments(markdownText, setMarkdownText) {
       // Update state and localStorage
       setDocuments(updatedDocs);
       documentsRef.current = updatedDocs;
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Show a notification to the user
-      const notificationEvent = new CustomEvent('show-notification', {
-        detail: { message: `Document saved as version ${updatedDoc.version - 1}` }
+      const notificationEvent = new CustomEvent("show-notification", {
+        detail: {
+          message: `Document saved as version ${updatedDoc.version - 1}`,
+        },
       });
       globalThis.dispatchEvent(notificationEvent);
 
       // Update layout component about the document change
-      globalThis.dispatchEvent(new CustomEvent('active-document-changed', {
-        detail: { document: updatedDoc }
-      }));
+      globalThis.dispatchEvent(
+        new CustomEvent("active-document-changed", {
+          detail: { document: updatedDoc },
+        }),
+      );
 
       return updatedDoc;
     } catch (error) {
-      console.error('Error saving document version:', error);
+      console.error("Error saving document version:", error);
       return null;
     }
   }, []);
@@ -580,11 +616,14 @@ export default function useDocuments(markdownText, setMarkdownText) {
     if (!activeDocumentIdRef.current) return false;
 
     try {
-      const versionData = restoreDocumentVersion(activeDocumentIdRef.current, versionId);
+      const versionData = restoreDocumentVersion(
+        activeDocumentIdRef.current,
+        versionId,
+      );
       if (!versionData) return false;
 
       // Get latest documents from localStorage
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
       if (docsString) {
         currentDocs = JSON.parse(docsString);
@@ -593,7 +632,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Update document with restored content
-      const updatedDocs = currentDocs.map(doc => {
+      const updatedDocs = currentDocs.map((doc) => {
         if (doc.id === activeDocumentIdRef.current) {
           return {
             ...doc,
@@ -604,8 +643,8 @@ export default function useDocuments(markdownText, setMarkdownText) {
             metadata: {
               ...doc.metadata,
               restored_from: versionId,
-              restored_at: new Date().toISOString()
-            }
+              restored_at: new Date().toISOString(),
+            },
           };
         }
         return doc;
@@ -614,7 +653,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       // Update state and localStorage
       setDocuments(updatedDocs);
       documentsRef.current = updatedDocs;
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Update the editor content with the restored content
       skipContentUpdateRef.current = true;
@@ -622,18 +661,22 @@ export default function useDocuments(markdownText, setMarkdownText) {
       currentContentRef.current = versionData.content;
 
       // Sync title changes with the file system
-      globalThis.dispatchEvent(new CustomEvent('document-title-changed', {
-        detail: { id: activeDocumentIdRef.current, title: versionData.title }
-      }));
+      globalThis.dispatchEvent(
+        new CustomEvent("document-title-changed", {
+          detail: { id: activeDocumentIdRef.current, title: versionData.title },
+        }),
+      );
 
       // Show a notification to the user
-      const notificationEvent = new CustomEvent('show-notification', {
-        detail: { message: `Restored document to version ${versionData.version}` }
+      const notificationEvent = new CustomEvent("show-notification", {
+        detail: {
+          message: `Restored document to version ${versionData.version}`,
+        },
       });
       globalThis.dispatchEvent(notificationEvent);
 
       // Update document tabs
-      const updatedTabs = documentTabsRef.current.map(tab => {
+      const updatedTabs = documentTabsRef.current.map((tab) => {
         if (tab.id === activeDocumentIdRef.current) {
           return { ...tab, title: versionData.title };
         }
@@ -645,7 +688,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
       return true;
     } catch (error) {
-      console.error('Error restoring document version:', error);
+      console.error("Error restoring document version:", error);
       return false;
     }
   }, [setMarkdownText]);
@@ -667,28 +710,29 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
       const newDoc = {
         id: newDocId,
-        user_id: 'current-user',
+        user_id: "current-user",
         uuid: crypto.randomUUID(),
-        title: 'New Document',
-        content: '# New Document\n\nStart typing here...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+        title: "New Document",
+        content:
+          "# New Document\n\nStart typing here...\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
         version: 1,
         is_published: false,
         created_at: now,
         updated_at: now,
         last_synced_at: now,
         metadata: {},
-        folder_id: 'root'
+        folder_id: "root",
       };
 
       // Get the current state of documents directly from localStorage
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
 
       if (docsString) {
         try {
           currentDocs = JSON.parse(docsString);
         } catch (e) {
-          console.error('Error parsing documents from localStorage:', e);
+          console.error("Error parsing documents from localStorage:", e);
           currentDocs = documentsRef.current;
         }
       } else {
@@ -699,10 +743,10 @@ export default function useDocuments(markdownText, setMarkdownText) {
       const updatedDocs = [...currentDocs, newDoc];
 
       // Save the new document list first
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Update localStorage before state changes
-      localStorage.setItem('lastActiveDocument', newDocId);
+      localStorage.setItem("lastActiveDocument", newDocId);
 
       // Update state
       setDocuments(updatedDocs);
@@ -732,9 +776,9 @@ export default function useDocuments(markdownText, setMarkdownText) {
       // Add to file system
       const fileObj = {
         id: newDocId,
-        name: 'New Document.md',
-        type: 'markdown',
-        documentRef: newDocId
+        name: "New Document.md",
+        type: "markdown",
+        documentRef: newDocId,
       };
 
       // Get current file system
@@ -744,7 +788,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
         try {
           currentFs = JSON.parse(fsString);
         } catch (e) {
-          console.error('Error parsing file system from localStorage:', e);
+          console.error("Error parsing file system from localStorage:", e);
           currentFs = fileSystemRef.current;
         }
       } else {
@@ -752,15 +796,15 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Find first folder to add the document to
-      const firstFolder = currentFs.find(item => item.type === 'folder');
+      const firstFolder = currentFs.find((item) => item.type === "folder");
 
       let updatedFs;
       if (firstFolder) {
-        updatedFs = currentFs.map(item => {
+        updatedFs = currentFs.map((item) => {
           if (item.id === firstFolder.id) {
             return {
               ...item,
-              children: [...(item.children || []), fileObj]
+              children: [...(item.children || []), fileObj],
             };
           }
           return item;
@@ -776,7 +820,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       localStorage.setItem(FILE_SYSTEM_KEY, JSON.stringify(updatedFs));
 
       // Notify file system to update
-      globalThis.dispatchEvent(new CustomEvent('documents-updated'));
+      globalThis.dispatchEvent(new CustomEvent("documents-updated"));
 
       // Clear the operation flag with a delay to ensure state updates complete
       setTimeout(() => {
@@ -785,7 +829,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
       return newDoc;
     } catch (error) {
-      console.error('Error creating new document:', error);
+      console.error("Error creating new document:", error);
       documentOperationInProgress.current = false;
       return null;
     }
@@ -794,7 +838,10 @@ export default function useDocuments(markdownText, setMarkdownText) {
   // Handle document tab changes - memoized with useCallback
   const handleDocumentChange = useCallback((documentId) => {
     // Don't do anything if we're already on this document or if an operation is in progress
-    if (documentId === activeDocumentIdRef.current || documentOperationInProgress.current) return;
+    if (
+      documentId === activeDocumentIdRef.current ||
+      documentOperationInProgress.current
+    ) return;
 
     try {
       // Set flag to prevent concurrent operations
@@ -806,7 +853,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Find the document content to load
-      const doc = documentsRef.current.find(d => d.id === documentId);
+      const doc = documentsRef.current.find((d) => d.id === documentId);
       if (doc) {
         // Important: Update the markdownText state with new content BEFORE changing active document
         skipContentUpdateRef.current = true;
@@ -814,23 +861,28 @@ export default function useDocuments(markdownText, setMarkdownText) {
         currentContentRef.current = doc.content;
 
         // Notify layout component about the document change
-        globalThis.dispatchEvent(new CustomEvent('active-document-changed', {
-          detail: { document: doc }
-        }));
+        globalThis.dispatchEvent(
+          new CustomEvent("active-document-changed", {
+            detail: { document: doc },
+          }),
+        );
       }
 
       // Update localStorage first for safety
-      localStorage.setItem('lastActiveDocument', documentId);
+      localStorage.setItem("lastActiveDocument", documentId);
 
       // Then, update state
       setActiveDocumentId(documentId);
       activeDocumentIdRef.current = documentId;
 
       // Add to document tabs if not already there
-      if (!documentTabsRef.current.some(tab => tab.id === documentId)) {
-        const docForTab = documentsRef.current.find(d => d.id === documentId);
+      if (!documentTabsRef.current.some((tab) => tab.id === documentId)) {
+        const docForTab = documentsRef.current.find((d) => d.id === documentId);
         if (docForTab) {
-          const updatedTabs = [...documentTabsRef.current, { id: documentId, title: docForTab.title }];
+          const updatedTabs = [...documentTabsRef.current, {
+            id: documentId,
+            title: docForTab.title,
+          }];
           setDocumentTabs(updatedTabs);
           documentTabsRef.current = updatedTabs;
           localStorage.setItem(DOCUMENT_TABS_KEY, JSON.stringify(updatedTabs));
@@ -845,7 +897,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
         documentOperationInProgress.current = false;
       }, 100);
     } catch (error) {
-      console.error('Error changing document:', error);
+      console.error("Error changing document:", error);
       documentOperationInProgress.current = false;
     }
   }, [saveDocumentToLocalStorageSync, setMarkdownText]);
@@ -855,7 +907,9 @@ export default function useDocuments(markdownText, setMarkdownText) {
     e.stopPropagation(); // Prevent triggering the parent click event
 
     // Remove document from tabs
-    const updatedTabs = documentTabsRef.current.filter(tab => tab.id !== documentId);
+    const updatedTabs = documentTabsRef.current.filter((tab) =>
+      tab.id !== documentId
+    );
     setDocumentTabs(updatedTabs);
     documentTabsRef.current = updatedTabs;
 
@@ -879,14 +933,14 @@ export default function useDocuments(markdownText, setMarkdownText) {
       documentOperationInProgress.current = true;
 
       // Get the latest documents from localStorage
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
 
       if (docsString) {
         try {
           currentDocs = JSON.parse(docsString);
         } catch (e) {
-          console.error('Error parsing documents from localStorage:', e);
+          console.error("Error parsing documents from localStorage:", e);
           currentDocs = documentsRef.current;
         }
       } else {
@@ -894,17 +948,19 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Filter out the document to be deleted
-      const updatedDocs = currentDocs.filter(doc => doc.id !== documentId);
+      const updatedDocs = currentDocs.filter((doc) => doc.id !== documentId);
 
       // Update localStorage first
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
 
       // Update state
       setDocuments(updatedDocs);
       documentsRef.current = updatedDocs;
 
       // Remove from tabs
-      const updatedTabs = documentTabsRef.current.filter(tab => tab.id !== documentId);
+      const updatedTabs = documentTabsRef.current.filter((tab) =>
+        tab.id !== documentId
+      );
       setDocumentTabs(updatedTabs);
       documentTabsRef.current = updatedTabs;
       localStorage.setItem(DOCUMENT_TABS_KEY, JSON.stringify(updatedTabs));
@@ -928,8 +984,8 @@ export default function useDocuments(markdownText, setMarkdownText) {
           // No documents left, create a new one
           const newDoc = createEmptyDocument();
           const docsWithNew = [newDoc];
-          localStorage.setItem('documents', JSON.stringify(docsWithNew));
-          localStorage.setItem('lastActiveDocument', newDoc.id);
+          localStorage.setItem("documents", JSON.stringify(docsWithNew));
+          localStorage.setItem("lastActiveDocument", newDoc.id);
 
           setDocuments(docsWithNew);
           documentsRef.current = docsWithNew;
@@ -949,7 +1005,7 @@ export default function useDocuments(markdownText, setMarkdownText) {
         documentOperationInProgress.current = false;
       }, 100);
     } catch (error) {
-      console.error('Error deleting document:', error);
+      console.error("Error deleting document:", error);
       documentOperationInProgress.current = false;
     }
   }, [handleDocumentChange]);
@@ -997,14 +1053,14 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Get latest documents from localStorage
-      const docsString = localStorage.getItem('documents');
+      const docsString = localStorage.getItem("documents");
       let currentDocs = [];
 
       if (docsString) {
         try {
           currentDocs = JSON.parse(docsString);
         } catch (e) {
-          console.error('Error parsing documents from localStorage:', e);
+          console.error("Error parsing documents from localStorage:", e);
           currentDocs = documentsRef.current;
         }
       } else {
@@ -1012,25 +1068,29 @@ export default function useDocuments(markdownText, setMarkdownText) {
       }
 
       // Update documents with new title
-      const updatedDocs = currentDocs.map(doc => {
+      const updatedDocs = currentDocs.map((doc) => {
         if (doc.id === editingTitleId) {
           const updatedDoc = {
             ...doc,
             title: editingTitleValue.trim(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           };
 
           // If this is the active document, notify layout of title change
           if (doc.id === activeDocumentIdRef.current) {
             // Dispatch title change event for immediate UI update
-            globalThis.dispatchEvent(new CustomEvent('file-title-changed', {
-              detail: { documentId: doc.id, title: editingTitleValue.trim() }
-            }));
+            globalThis.dispatchEvent(
+              new CustomEvent("file-title-changed", {
+                detail: { documentId: doc.id, title: editingTitleValue.trim() },
+              }),
+            );
 
             // Keep the existing document-title-changed event for compatibility
-            globalThis.dispatchEvent(new CustomEvent('document-title-changed', {
-              detail: { id: doc.id, title: editingTitleValue.trim() }
-            }));
+            globalThis.dispatchEvent(
+              new CustomEvent("document-title-changed", {
+                detail: { id: doc.id, title: editingTitleValue.trim() },
+              }),
+            );
           }
 
           return updatedDoc;
@@ -1039,12 +1099,12 @@ export default function useDocuments(markdownText, setMarkdownText) {
       });
 
       // Update state and localStorage
-      localStorage.setItem('documents', JSON.stringify(updatedDocs));
+      localStorage.setItem("documents", JSON.stringify(updatedDocs));
       setDocuments(updatedDocs);
       documentsRef.current = updatedDocs;
 
       // Update document tabs
-      const updatedTabs = documentTabsRef.current.map(tab => {
+      const updatedTabs = documentTabsRef.current.map((tab) => {
         if (tab.id === editingTitleId) {
           return { ...tab, title: editingTitleValue.trim() };
         }
@@ -1064,10 +1124,10 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
           // Helper function to update file name in file system
           const updateFileName = (items) => {
-            return items.map(item => {
+            return items.map((item) => {
               if (item.documentRef === editingTitleId) {
                 // Ensure markdown files have .md extension
-                const fileName = editingTitleValue.trim().endsWith('.md')
+                const fileName = editingTitleValue.trim().endsWith(".md")
                   ? editingTitleValue.trim()
                   : `${editingTitleValue.trim()}.md`;
 
@@ -1083,23 +1143,26 @@ export default function useDocuments(markdownText, setMarkdownText) {
           };
 
           const updatedFileSystem = updateFileName(fs);
-          localStorage.setItem(FILE_SYSTEM_KEY, JSON.stringify(updatedFileSystem));
+          localStorage.setItem(
+            FILE_SYSTEM_KEY,
+            JSON.stringify(updatedFileSystem),
+          );
           setFileSystem(updatedFileSystem);
           fileSystemRef.current = updatedFileSystem;
         } catch (error) {
-          console.error('Error updating file system:', error);
+          console.error("Error updating file system:", error);
         }
       }
 
       // Notify file system to update
-      globalThis.dispatchEvent(new CustomEvent('documents-updated'));
+      globalThis.dispatchEvent(new CustomEvent("documents-updated"));
 
       // Clear title operation flag with a delay
       setTimeout(() => {
         titleOperationInProgress.current = false;
       }, 50);
     } catch (error) {
-      console.error('Error saving edited title:', error);
+      console.error("Error saving edited title:", error);
       titleOperationInProgress.current = false;
       setEditingTitleId(null);
     }
@@ -1107,9 +1170,9 @@ export default function useDocuments(markdownText, setMarkdownText) {
 
   // Handle title input key events - memoized with useCallback
   const handleTitleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       saveEditedTitle();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setEditingTitleId(null);
       titleOperationInProgress.current = false;
     }
@@ -1133,6 +1196,6 @@ export default function useDocuments(markdownText, setMarkdownText) {
     saveDocumentToLocalStorage,
     saveNewDocumentVersion,
     getVersions,
-    restoreVersion
+    restoreVersion,
   };
 }

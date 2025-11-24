@@ -1,23 +1,23 @@
 // @ts-nocheck
-import { useCallback, useEffect, useRef, useState } from 'react';
-import DashboardLayout from './components/layout/DashboardLayout.jsx';
-import DocumentTabs from './components/documents/DocumentTabs.jsx';
-import CodeMirrorEditor from './components/editor/CodeMirrorEditor.jsx';
-import MarkdownPreview from './components/preview/MarkdownPreview.jsx';
-import StatusBar from './components/editor/StatusBar.jsx';
-import useDocuments from './hooks/useDocuments.js';
-import { useTheme } from './contexts/ThemeContext.jsx';
+import { useCallback, useEffect, useRef, useState } from "react";
+import DashboardLayout from "./components/layout/DashboardLayout.jsx";
+import DocumentTabs from "./components/documents/DocumentTabs.jsx";
+import CodeMirrorEditor from "./components/editor/CodeMirrorEditor.jsx";
+import MarkdownPreview from "./components/preview/MarkdownPreview.jsx";
+import StatusBar from "./components/editor/StatusBar.jsx";
+import useDocuments from "./hooks/useDocuments.js";
+import { useTheme } from "./contexts/ThemeContext.jsx";
 
 export default function App() {
-  const [markdownText, setMarkdownText] = useState('# Loading...');
-  const [editStatus, setEditStatus] = useState<'editing' | 'saved'>('saved');
-  const [activeView, setActiveView] = useState<'editor' | 'preview'>('editor');
+  const [markdownText, setMarkdownText] = useState("# Loading...");
+  const [editStatus, setEditStatus] = useState<"editing" | "saved">("saved");
+  const [activeView, setActiveView] = useState<"editor" | "preview">("editor");
   const [isMobile, setIsMobile] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(true);
 
   const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
+  const isDarkMode = resolvedTheme === "dark";
 
   const previewRef = useRef<HTMLDivElement | null>(null);
   const editorViewRef = useRef<any>(null);
@@ -43,38 +43,38 @@ export default function App() {
     saveDocumentToLocalStorage,
     saveNewDocumentVersion,
     getVersions,
-    restoreVersion
+    restoreVersion,
   } = useDocuments(markdownText, setMarkdownText);
 
   const togglePreview = useCallback(() => {
     setIsPreviewVisible((prev) => {
       const nextValue = !prev;
-      localStorage.setItem('previewVisible', nextValue.toString());
+      localStorage.setItem("previewVisible", nextValue.toString());
       return nextValue;
     });
   }, []);
 
   useEffect(() => {
-    const savedPreference = localStorage.getItem('previewVisible');
+    const savedPreference = localStorage.getItem("previewVisible");
     if (savedPreference !== null) {
-      setIsPreviewVisible(savedPreference === 'true');
+      setIsPreviewVisible(savedPreference === "true");
     }
   }, []);
 
   const toggleView = () => {
-    setActiveView((current) => (current === 'editor' ? 'preview' : 'editor'));
+    setActiveView((current) => (current === "editor" ? "preview" : "editor"));
   };
 
   const getContentHeight = () => {
     if (isMobile) {
-      return 'h-[calc(100%-60px-20px)]';
+      return "h-[calc(100%-60px-20px)]";
     }
-    return 'h-[calc(100%-120px)]';
+    return "h-[calc(100%-120px)]";
   };
 
   const getEditorWidth = () => {
-    if (isMobile) return 'w-full';
-    return isPreviewVisible ? 'w-1/2' : 'w-full';
+    if (isMobile) return "w-full";
+    return isPreviewVisible ? "w-1/2" : "w-full";
   };
 
   useEffect(() => {
@@ -82,20 +82,22 @@ export default function App() {
       const isMobileView = globalThis.innerWidth < 768;
       setIsMobile(isMobileView);
       if (isMobileView) {
-        setActiveView('editor');
+        setActiveView("editor");
       }
     };
 
     checkMobile();
-    globalThis.addEventListener('resize', checkMobile);
-    return () => globalThis.removeEventListener('resize', checkMobile);
+    globalThis.addEventListener("resize", checkMobile);
+    return () => globalThis.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
     if (activeDocumentId && getVersions && restoreVersion) {
-      globalThis.dispatchEvent(new CustomEvent('version-functions-ready', {
-        detail: { getVersions, restoreVersion }
-      }));
+      globalThis.dispatchEvent(
+        new CustomEvent("version-functions-ready", {
+          detail: { getVersions, restoreVersion },
+        }),
+      );
     }
   }, [documents, activeDocumentId, getVersions, restoreVersion]);
 
@@ -113,12 +115,21 @@ export default function App() {
       setTimeout(() => setNotification(null), 3000);
     };
 
-    globalThis.addEventListener('save-document-version', handleSaveVersion);
-    globalThis.addEventListener('show-notification', handleNotification as EventListener);
+    globalThis.addEventListener("save-document-version", handleSaveVersion);
+    globalThis.addEventListener(
+      "show-notification",
+      handleNotification as EventListener,
+    );
 
     return () => {
-      globalThis.removeEventListener('save-document-version', handleSaveVersion);
-      globalThis.removeEventListener('show-notification', handleNotification as EventListener);
+      globalThis.removeEventListener(
+        "save-document-version",
+        handleSaveVersion,
+      );
+      globalThis.removeEventListener(
+        "show-notification",
+        handleNotification as EventListener,
+      );
     };
   }, [markdownText, saveDocumentToLocalStorage, saveNewDocumentVersion]);
 
@@ -126,7 +137,8 @@ export default function App() {
     if (!previewRef.current || isPreviewScrolling) return;
     setIsEditorScrolling(true);
     const previewElement = previewRef.current;
-    const previewScrollHeight = previewElement.scrollHeight - previewElement.clientHeight;
+    const previewScrollHeight = previewElement.scrollHeight -
+      previewElement.clientHeight;
     previewElement.scrollTop = previewScrollHeight * percentage;
     setTimeout(() => setIsEditorScrolling(false), 20);
   }, [isPreviewScrolling]);
@@ -136,7 +148,10 @@ export default function App() {
     setIsPreviewScrolling(true);
     const { scrollTop, scrollHeight, clientHeight } = previewRef.current;
     const percentage = scrollTop / (scrollHeight - clientHeight || 1);
-    if (editorViewRef.current && typeof editorViewRef.current.scrollToPercentage === 'function') {
+    if (
+      editorViewRef.current &&
+      typeof editorViewRef.current.scrollToPercentage === "function"
+    ) {
       editorViewRef.current.scrollToPercentage(percentage);
     }
     setTimeout(() => setIsPreviewScrolling(false), 20);
@@ -145,13 +160,13 @@ export default function App() {
   const handleTextChange = useCallback((newText: string) => {
     if (newText === markdownText) return;
     setMarkdownText(newText);
-    setEditStatus('editing');
+    setEditStatus("editing");
     saveDocumentToLocalStorage(newText);
 
-    if (isMobile && activeView === 'editor') {
+    if (isMobile && activeView === "editor") {
       setTimeout(() => {
-        if (activeView === 'editor') {
-          setActiveView('preview');
+        if (activeView === "editor") {
+          setActiveView("preview");
         }
       }, 800);
     }
@@ -161,7 +176,7 @@ export default function App() {
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      setEditStatus('saved');
+      setEditStatus("saved");
     }, 500);
   }, [markdownText, isMobile, activeView, saveDocumentToLocalStorage]);
 
@@ -173,10 +188,10 @@ export default function App() {
       const line = state.doc.lineAt(pos);
       return {
         line: line.number,
-        column: pos - line.from + 1
+        column: pos - line.from + 1,
       };
     } catch (error) {
-      console.error('Error getting cursor position:', error);
+      console.error("Error getting cursor position:", error);
       return { line: 1, column: 1 };
     }
   }, []);
@@ -190,25 +205,39 @@ export default function App() {
       }
     };
 
-    globalThis.addEventListener('sidebar-document-changed', handleSidebarDocumentChange);
+    globalThis.addEventListener(
+      "sidebar-document-changed",
+      handleSidebarDocumentChange,
+    );
     return () => {
-      globalThis.removeEventListener('sidebar-document-changed', handleSidebarDocumentChange);
+      globalThis.removeEventListener(
+        "sidebar-document-changed",
+        handleSidebarDocumentChange,
+      );
     };
   }, [activeDocumentId, handleDocumentChange]);
 
   useEffect(() => {
     const handleFileTitleChanged = (event: Event) => {
-      const customEvent = event as CustomEvent<{ documentId: string; title: string }>;
+      const customEvent = event as CustomEvent<
+        { documentId: string; title: string }
+      >;
       const { documentId, title } = customEvent.detail || {};
       if (documentId && documentId === activeDocumentId) {
-        globalThis.dispatchEvent(new CustomEvent('update-document-title', {
-          detail: { documentId, title }
-        }));
+        globalThis.dispatchEvent(
+          new CustomEvent("update-document-title", {
+            detail: { documentId, title },
+          }),
+        );
       }
     };
 
-    globalThis.addEventListener('file-title-changed', handleFileTitleChanged);
-    return () => globalThis.removeEventListener('file-title-changed', handleFileTitleChanged);
+    globalThis.addEventListener("file-title-changed", handleFileTitleChanged);
+    return () =>
+      globalThis.removeEventListener(
+        "file-title-changed",
+        handleFileTitleChanged,
+      );
   }, [activeDocumentId]);
 
   useEffect(() => {
@@ -241,9 +270,13 @@ export default function App() {
             />
           </div>
 
-          <div className={`flex md:flex-row flex-col overflow-hidden bg-neutral-100 dark:bg-neutral-900 ${getContentHeight()} md:h-[calc(100%-135px)]`}>
+          <div
+            className={`flex md:flex-row flex-col overflow-hidden bg-neutral-100 dark:bg-neutral-900 ${getContentHeight()} md:h-[calc(100%-135px)]`}
+          >
             <div
-              className={`${activeView === 'editor' || !isMobile ? 'flex' : 'hidden'} 
+              className={`${
+                activeView === "editor" || !isMobile ? "flex" : "hidden"
+              } 
                 ${getEditorWidth()} h-full relative overflow-hidden`}
             >
               <CodeMirrorEditor
@@ -260,9 +293,11 @@ export default function App() {
               />
             </div>
 
-            {(isPreviewVisible || (isMobile && activeView === 'preview')) && (
+            {(isPreviewVisible || (isMobile && activeView === "preview")) && (
               <div
-                className={`${activeView === 'preview' || !isMobile ? 'flex' : 'hidden'} 
+                className={`${
+                  activeView === "preview" || !isMobile ? "flex" : "hidden"
+                } 
                   w-full md:w-1/2 h-full relative overflow-hidden`}
               >
                 <MarkdownPreview
@@ -285,18 +320,49 @@ export default function App() {
             <button
               onClick={toggleView}
               className="md:hidden fixed bottom-[16vh] right-6 z-30 bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-white p-3 rounded-md"
-              aria-label={`Switch to ${activeView === 'editor' ? 'preview' : 'editor'}`}
+              aria-label={`Switch to ${
+                activeView === "editor" ? "preview" : "editor"
+              }`}
             >
-              {activeView === 'editor' ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="#606060">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="#606060">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              )}
+              {activeView === "editor"
+                ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="#606060"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                )
+                : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="#606060"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                )}
             </button>
           )}
         </div>

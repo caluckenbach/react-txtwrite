@@ -1,25 +1,26 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { marked } from 'marked';
+import { useCallback } from "react";
+import { marked } from "marked";
 
 export default function useExportPDF() {
-    const exportAsPDF = useCallback(async (markdownContent, fileName = 'document.pdf') => {
-        try {
-            // Dynamically import html2pdf only in the browser
-            const html2pdf = (await import('html2pdf.js')).default;
+  const exportAsPDF = useCallback(
+    async (markdownContent, fileName = "document.pdf") => {
+      try {
+        // Dynamically import html2pdf only in the browser
+        const html2pdf = (await import("html2pdf.js")).default;
 
-            // Convert markdown to HTML first
-            const htmlContent = marked(markdownContent);
+        // Convert markdown to HTML first
+        const htmlContent = marked(markdownContent);
 
-            // Create a temporary div to hold the content
-            const tempDiv = document.createElement('div');
-            tempDiv.className = 'markdown-export';
-            tempDiv.innerHTML = htmlContent;
+        // Create a temporary div to hold the content
+        const tempDiv = document.createElement("div");
+        tempDiv.className = "markdown-export";
+        tempDiv.innerHTML = htmlContent;
 
-            // Add some basic styling to make the PDF look nice
-            const style = document.createElement('style');
-            style.textContent = `
+        // Add some basic styling to make the PDF look nice
+        const style = document.createElement("style");
+        style.textContent = `
         .markdown-export {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
           line-height: 1.6;
@@ -63,36 +64,38 @@ export default function useExportPDF() {
         }
       `;
 
-            tempDiv.appendChild(style);
-            document.body.appendChild(tempDiv);
+        tempDiv.appendChild(style);
+        document.body.appendChild(tempDiv);
 
-            // Configure html2pdf options
-            const options = {
-                margin: [15, 15],
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+        // Configure html2pdf options
+        const options = {
+          margin: [15, 15],
+          filename: fileName,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        };
 
-            // Generate PDF
-            html2pdf()
-                .set(options)
-                .from(tempDiv)
-                .save()
-                .then(() => {
-                    // Clean up
-                    document.body.removeChild(tempDiv);
-                })
-                .catch(error => {
-                    console.error('Error generating PDF:', error);
-                    document.body.removeChild(tempDiv);
-                });
-        } catch (error) {
-            console.error('Error during PDF export:', error);
-            alert('Could not generate PDF. Please try again.');
-        }
-    }, []);
+        // Generate PDF
+        html2pdf()
+          .set(options)
+          .from(tempDiv)
+          .save()
+          .then(() => {
+            // Clean up
+            document.body.removeChild(tempDiv);
+          })
+          .catch((error) => {
+            console.error("Error generating PDF:", error);
+            document.body.removeChild(tempDiv);
+          });
+      } catch (error) {
+        console.error("Error during PDF export:", error);
+        alert("Could not generate PDF. Please try again.");
+      }
+    },
+    [],
+  );
 
-    return { exportAsPDF };
+  return { exportAsPDF };
 }

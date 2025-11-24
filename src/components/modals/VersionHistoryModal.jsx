@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { X, Clock } from 'lucide-react';
-import VersionHistory from '../documents/VersionHistory.jsx';
+import { useEffect, useRef, useState } from "react";
+import { Clock, X } from "lucide-react";
+import VersionHistory from "../documents/VersionHistory.jsx";
 
-export default function VersionHistoryModal({ 
-  isOpen, 
-  onClose, 
-  documentId, 
-  currentVersion, 
-  getVersions, 
-  restoreVersion 
+export default function VersionHistoryModal({
+  isOpen,
+  onClose,
+  documentId,
+  currentVersion,
+  getVersions,
+  restoreVersion,
 }) {
   const drawerRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -24,17 +24,17 @@ export default function VersionHistoryModal({
       const animationTimer = setTimeout(() => {
         // Now update the DOM to trigger the animation
         if (drawerRef.current) {
-          drawerRef.current.classList.remove('translate-x-full');
-          drawerRef.current.classList.add('translate-x-0');
+          drawerRef.current.classList.remove("translate-x-full");
+          drawerRef.current.classList.add("translate-x-0");
         }
       }, 10); // Small delay to ensure DOM updates
-      
+
       return () => clearTimeout(animationTimer);
     } else {
       // When closing, first animate out
       if (drawerRef.current) {
-        drawerRef.current.classList.remove('translate-x-0');
-        drawerRef.current.classList.add('translate-x-full');
+        drawerRef.current.classList.remove("translate-x-0");
+        drawerRef.current.classList.add("translate-x-full");
       }
       // Then after animation completes, hide the component
       const timer = setTimeout(() => {
@@ -53,41 +53,41 @@ export default function VersionHistoryModal({
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen, onClose]);
 
   // Handle escape key
   useEffect(() => {
     const handleEscapeKey = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
+      document.addEventListener("keydown", handleEscapeKey);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [isOpen, onClose]);
 
   // Prevent body scrolling when drawer is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    
+
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -96,21 +96,23 @@ export default function VersionHistoryModal({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Glassmorphic backdrop with blur effect */}
-      <div 
-        className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+      <div
+        className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)'
+          backgroundColor: "rgba(0, 0, 0, 0.25)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
         }}
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Sliding drawer */}
       <div className="absolute inset-y-0 right-0 max-w-full flex outline-none">
-        <div 
-          ref={drawerRef} 
+        <div
+          ref={drawerRef}
           className="w-full sm:w-[420px] md:w-[540px] h-full transform transition-transform duration-300 ease-out bg-white dark:bg-neutral-900 shadow-xl flex flex-col translate-x-full"
         >
           {/* Header */}
@@ -119,7 +121,7 @@ export default function VersionHistoryModal({
               <Clock className="mr-2 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
               Document History
             </h2>
-            <button 
+            <button
               onClick={onClose}
               className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 focus:outline-none p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               aria-label="Close"
@@ -127,7 +129,7 @@ export default function VersionHistoryModal({
               <X size={20} />
             </button>
           </div>
-          
+
           {/* Content area */}
           <div className="flex-1 overflow-hidden">
             <VersionHistory
@@ -138,7 +140,7 @@ export default function VersionHistoryModal({
               onClose={onClose}
             />
           </div>
-          
+
           {/* Optional footer */}
           <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
             Save a new version anytime with Cmd+S / Ctrl+S

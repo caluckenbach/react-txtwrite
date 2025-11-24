@@ -1,8 +1,8 @@
 // Logging disabled for local-only mode.
 export async function logApiUsage() {
-    return;
+  return;
 }
 
 export function estimateTokenCount() {
-    return 0;
+  return 0;
 }

@@ -10,21 +10,25 @@
  * @param {number} position - Cursor position in the document
  * @param {object} additionalData - Any additional data to store
  */
-export const saveCursorPosition = (documentId, position, additionalData = {}) => {
-    if (!documentId || position === undefined) return;
+export const saveCursorPosition = (
+  documentId,
+  position,
+  additionalData = {},
+) => {
+  if (!documentId || position === undefined) return;
 
-    try {
-        const data = {
-            documentId,
-            position,
-            timestamp: Date.now(),
-            ...additionalData
-        };
+  try {
+    const data = {
+      documentId,
+      position,
+      timestamp: Date.now(),
+      ...additionalData,
+    };
 
-        localStorage.setItem('lastCursorPosition', JSON.stringify(data));
-    } catch (error) {
-        console.error('Error saving cursor position:', error);
-    }
+    localStorage.setItem("lastCursorPosition", JSON.stringify(data));
+  } catch (error) {
+    console.error("Error saving cursor position:", error);
+  }
 };
 
 /**
@@ -33,34 +37,34 @@ export const saveCursorPosition = (documentId, position, additionalData = {}) =>
  * @returns {object|null} - Object with position or null if not found
  */
 export const getCursorPosition = (documentId) => {
-    try {
-        const savedPositionData = localStorage.getItem('lastCursorPosition');
+  try {
+    const savedPositionData = localStorage.getItem("lastCursorPosition");
 
-        if (!savedPositionData) return null;
+    if (!savedPositionData) return null;
 
-        const data = JSON.parse(savedPositionData);
+    const data = JSON.parse(savedPositionData);
 
-        // If documentId is provided, only return if it's for the requested document
-        if (documentId && data.documentId !== documentId) {
-            return null;
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error retrieving cursor position:', error);
-        return null;
+    // If documentId is provided, only return if it's for the requested document
+    if (documentId && data.documentId !== documentId) {
+      return null;
     }
+
+    return data;
+  } catch (error) {
+    console.error("Error retrieving cursor position:", error);
+    return null;
+  }
 };
 
 /**
  * Clear the saved cursor position
  */
 export const clearCursorPosition = () => {
-    try {
-        localStorage.removeItem('lastCursorPosition');
-    } catch (error) {
-        console.error('Error clearing cursor position:', error);
-    }
+  try {
+    localStorage.removeItem("lastCursorPosition");
+  } catch (error) {
+    console.error("Error clearing cursor position:", error);
+  }
 };
 
 /**
@@ -69,19 +73,19 @@ export const clearCursorPosition = () => {
  * @param {number} scrollPercentage - Scroll position as percentage (0-1)
  */
 export const saveScrollPosition = (documentId, scrollPercentage) => {
-    if (!documentId || scrollPercentage === undefined) return;
+  if (!documentId || scrollPercentage === undefined) return;
 
-    try {
-        const data = {
-            documentId,
-            scrollPercentage,
-            timestamp: Date.now()
-        };
+  try {
+    const data = {
+      documentId,
+      scrollPercentage,
+      timestamp: Date.now(),
+    };
 
-        localStorage.setItem('lastScrollPosition', JSON.stringify(data));
-    } catch (error) {
-        console.error('Error saving scroll position:', error);
-    }
+    localStorage.setItem("lastScrollPosition", JSON.stringify(data));
+  } catch (error) {
+    console.error("Error saving scroll position:", error);
+  }
 };
 
 /**
@@ -90,23 +94,23 @@ export const saveScrollPosition = (documentId, scrollPercentage) => {
  * @returns {object|null} - Object with scrollPercentage or null if not found
  */
 export const getScrollPosition = (documentId) => {
-    try {
-        const savedPositionData = localStorage.getItem('lastScrollPosition');
+  try {
+    const savedPositionData = localStorage.getItem("lastScrollPosition");
 
-        if (!savedPositionData) return null;
+    if (!savedPositionData) return null;
 
-        const data = JSON.parse(savedPositionData);
+    const data = JSON.parse(savedPositionData);
 
-        // If documentId is provided, only return if it's for the requested document
-        if (documentId && data.documentId !== documentId) {
-            return null;
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error retrieving scroll position:', error);
-        return null;
+    // If documentId is provided, only return if it's for the requested document
+    if (documentId && data.documentId !== documentId) {
+      return null;
     }
+
+    return data;
+  } catch (error) {
+    console.error("Error retrieving scroll position:", error);
+    return null;
+  }
 };
 
 /**
@@ -115,16 +119,20 @@ export const getScrollPosition = (documentId) => {
  * @param {number} cursorPosition - Cursor position in the document
  * @param {number} scrollPercentage - Scroll position as percentage (0-1)
  */
-export const saveEditorState = (documentId, cursorPosition, scrollPercentage) => {
-    if (!documentId) return;
+export const saveEditorState = (
+  documentId,
+  cursorPosition,
+  scrollPercentage,
+) => {
+  if (!documentId) return;
 
-    try {
-        saveCursorPosition(documentId, cursorPosition);
+  try {
+    saveCursorPosition(documentId, cursorPosition);
 
-        if (scrollPercentage !== undefined) {
-            saveScrollPosition(documentId, scrollPercentage);
-        }
-    } catch (error) {
-        console.error('Error saving editor state:', error);
+    if (scrollPercentage !== undefined) {
+      saveScrollPosition(documentId, scrollPercentage);
     }
+  } catch (error) {
+    console.error("Error saving editor state:", error);
+  }
 };
