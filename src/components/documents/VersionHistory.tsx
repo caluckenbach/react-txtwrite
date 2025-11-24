@@ -137,6 +137,7 @@ export default function VersionHistory({
         </h2>
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
             className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
@@ -190,12 +191,14 @@ export default function VersionHistory({
                                 </div>
                                 <div className="flex gap-2 mt-2">
                                   <button
+                                    type="button"
                                     onClick={() => confirmRestore(version)}
                                     className="px-2 py-1 text-xs rounded bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1"
                                   >
                                     <Check size={12} /> Restore
                                   </button>
                                   <button
+                                    type="button"
                                     onClick={cancelRestore}
                                     className="px-2 py-1 text-xs rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-300 flex items-center gap-1"
                                   >
@@ -226,6 +229,7 @@ export default function VersionHistory({
                           </div>
                           <div className="flex items-center">
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRestore(version);

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-check
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -32,7 +32,6 @@ export default function CodeMirrorEditor({
   markdownText,
   onTextChange,
   onScroll,
-  saveDocumentToLocalStorage,
   setEditStatus,
   isDarkMode,
   editorViewRef,
@@ -601,6 +600,7 @@ export default function CodeMirrorEditor({
         <div className="hidden md:flex flex-col items-center justify-between bg-neutral-100 dark:bg-neutral-900 top-0 right-2 overflow-hidden w-8 h-full ms-2">
           <div className="flex flex-col items-center p-2">
             <button
+              type="button"
               onClick={handleBold}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Bold"
@@ -608,6 +608,7 @@ export default function CodeMirrorEditor({
               <FaBold />
             </button>
             <button
+              type="button"
               onClick={handleItalic}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Italic"
@@ -615,6 +616,7 @@ export default function CodeMirrorEditor({
               <FaItalic />
             </button>
             <button
+              type="button"
               onClick={handleHeading}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Heading"
@@ -623,6 +625,7 @@ export default function CodeMirrorEditor({
             </button>
             <span className="mx-1 text-neutral-600 py-4"></span>
             <button
+              type="button"
               onClick={handleUnorderedList}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Bullet List"
@@ -630,6 +633,7 @@ export default function CodeMirrorEditor({
               <FaListUl />
             </button>
             <button
+              type="button"
               onClick={handleOrderedList}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Numbered List"
@@ -637,6 +641,7 @@ export default function CodeMirrorEditor({
               <FaListOl />
             </button>
             <button
+              type="button"
               onClick={handleCheckbox}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Checkbox"
@@ -645,6 +650,7 @@ export default function CodeMirrorEditor({
             </button>
             <span className="mx-1 text-neutral-600 py-4"></span>
             <button
+              type="button"
               onClick={handleLink}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Link"
@@ -652,6 +658,7 @@ export default function CodeMirrorEditor({
               <FaLink />
             </button>
             <button
+              type="button"
               onClick={handleImage}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Image"
@@ -659,6 +666,7 @@ export default function CodeMirrorEditor({
               <FaImage />
             </button>
             <button
+              type="button"
               onClick={handleCode}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Code Block"
@@ -666,6 +674,7 @@ export default function CodeMirrorEditor({
               <FaCode />
             </button>
             <button
+              type="button"
               onClick={handleQuote}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Quote"
@@ -673,6 +682,7 @@ export default function CodeMirrorEditor({
               <FaQuoteRight />
             </button>
             <button
+              type="button"
               onClick={handleTable}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title="Table"
@@ -683,6 +693,7 @@ export default function CodeMirrorEditor({
 
           <div className="flex flex-col items-center">
             <button
+              type="button"
               onClick={togglePreview}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title={isPreviewVisible ? "Hide Preview" : "Show Preview"}
@@ -690,6 +701,7 @@ export default function CodeMirrorEditor({
               {isPreviewVisible ? <Eye /> : <EyeOff />}
             </button>
             <button
+              type="button"
               onClick={togglePreview}
               className="p-1 text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 rounded"
               title={isPreviewVisible ? "Hide Preview" : "Show Preview"}
@@ -718,6 +730,7 @@ export default function CodeMirrorEditor({
               {isToolbarCollapsed ? "Format" : "Formatting Tools"}
             </span>
             <button
+              type="button"
               className="p-1 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded"
               onClick={toggleToolbar}
             >
@@ -741,6 +754,7 @@ export default function CodeMirrorEditor({
               {/* First group - Common formatting options */}
               <div className="flex space-x-1 px-2">
                 <button
+                  type="button"
                   onClick={handleBold}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Bold"
@@ -748,6 +762,7 @@ export default function CodeMirrorEditor({
                   <FaBold size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleItalic}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Italic"
@@ -755,6 +770,7 @@ export default function CodeMirrorEditor({
                   <FaItalic size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleHeading}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Heading"
@@ -770,6 +786,7 @@ export default function CodeMirrorEditor({
               {/* Second group - Lists */}
               <div className="flex space-x-1 px-2">
                 <button
+                  type="button"
                   onClick={handleUnorderedList}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Bullet List"
@@ -777,6 +794,7 @@ export default function CodeMirrorEditor({
                   <FaListUl size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleOrderedList}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Numbered List"
@@ -784,6 +802,7 @@ export default function CodeMirrorEditor({
                   <FaListOl size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleCheckbox}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Checkbox"
@@ -799,6 +818,7 @@ export default function CodeMirrorEditor({
               {/* Third group - Links and media */}
               <div className="flex space-x-1 px-2">
                 <button
+                  type="button"
                   onClick={handleLink}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Link"
@@ -806,6 +826,7 @@ export default function CodeMirrorEditor({
                   <FaLink size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleImage}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Image"
@@ -821,6 +842,7 @@ export default function CodeMirrorEditor({
               {/* Fourth group - Code, quotes, tables */}
               <div className="flex space-x-1 px-2">
                 <button
+                  type="button"
                   onClick={handleCode}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Code Block"
@@ -828,6 +850,7 @@ export default function CodeMirrorEditor({
                   <FaCode size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleQuote}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Quote"
@@ -835,6 +858,7 @@ export default function CodeMirrorEditor({
                   <FaQuoteRight size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleTable}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Table"
@@ -844,6 +868,7 @@ export default function CodeMirrorEditor({
               </div>
               <div className="flex space-x-1 px-2">
                 <button
+                  type="button"
                   onClick={handleCode}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Code Block"
@@ -851,6 +876,7 @@ export default function CodeMirrorEditor({
                   <FaCode size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleQuote}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Quote"
@@ -858,6 +884,7 @@ export default function CodeMirrorEditor({
                   <FaQuoteRight size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={handleTable}
                   className="p-2 min-w-[44px] flex flex-col items-center text-neutral-800 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
                   title="Table"

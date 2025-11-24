@@ -223,6 +223,7 @@ export default function DocumentTabs({
             <div className="absolute inset-0 bg-gradient-to-r from-neutral-100 dark:from-neutral-900 to-transparent pointer-events-none">
             </div>
             <button
+              type="button"
               className="absolute left-1 top-1/2 transform -translate-y-1/2 p-1 rounded-full bg-neutral-200 dark:bg-neutral-800 shadow-sm text-neutral-700 dark:text-neutral-400"
               onClick={() => scrollTabs("left", true)}
               aria-label="Scroll left"
@@ -254,6 +255,7 @@ export default function DocumentTabs({
                 {tab.title}
               </span>
               <button
+                type="button"
                 className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 ml-1 flex-shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -281,6 +283,7 @@ export default function DocumentTabs({
             <div className="absolute inset-0 bg-gradient-to-l from-neutral-100 dark:from-neutral-900 to-transparent pointer-events-none">
             </div>
             <button
+              type="button"
               className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 rounded-full bg-neutral-200 dark:bg-neutral-800 shadow-sm text-neutral-700 dark:text-neutral-400"
               onClick={() => scrollTabs("right", true)}
               aria-label="Scroll right"
@@ -299,6 +302,7 @@ export default function DocumentTabs({
             <div className="rounded-md absolute inset-0 bg-gradient-to-r from-brand-light dark:from-brand-dark to-transparent">
             </div>
             <button
+              type="button"
               className="absolute left-1 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full text-neutral-700 opacity-90 transition-opacity duration-200 pointer-events-auto"
               onClick={() => scrollTabs("left")}
               aria-label="Scroll left"
@@ -350,6 +354,7 @@ export default function DocumentTabs({
                       {tab.title}
                     </span>
                     <button
+                      type="button"
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-neutral-700 hover:text-neutral-500 flex-shrink-0 ml-1"
                       onClick={(e) => handleCloseTab(e, tab.id)}
                       title="Close tab"
@@ -376,6 +381,7 @@ export default function DocumentTabs({
             <div className="rounded-md absolute inset-0 bg-gradient-to-l from-brand-light dark:from-brand-dark to-transparent">
             </div>
             <button
+              type="button"
               className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full text-neutral-700 opacity-90 transition-opacity duration-200 pointer-events-auto"
               onClick={() => scrollTabs("right")}
               aria-label="Scroll right"

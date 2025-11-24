@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-check
 import {
   type MutableRefObject,
   useCallback,

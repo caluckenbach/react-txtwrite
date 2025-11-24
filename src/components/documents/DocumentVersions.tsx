@@ -66,6 +66,7 @@ export default function DocumentVersions({
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 px-2 py-1 text-sm text-neutral-400 dark:text-neutral-600 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded"
       >
@@ -109,6 +110,7 @@ export default function DocumentVersions({
                                 </div>
                                 <div className="flex gap-1 mt-1.5">
                                   <button
+                                    type="button"
                                     onClick={() => confirmRestore(version)}
                                     className="px-2 py-0.5 text-xs rounded bg-amber-600 hover:bg-amber-700 text-white flex items-center"
                                   >
@@ -116,6 +118,7 @@ export default function DocumentVersions({
                                     Restore
                                   </button>
                                   <button
+                                    type="button"
                                     onClick={cancelRestore}
                                     className="px-2 py-0.5 text-xs rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-300 flex items-center"
                                   >
@@ -138,6 +141,7 @@ export default function DocumentVersions({
                               </div>
                             </div>
                             <button
+                              type="button"
                               onClick={() => handleRestore(version)}
                               className="p-1 text-neutral-700 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300"
                               title="Restore this version"

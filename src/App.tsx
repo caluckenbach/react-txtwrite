@@ -1,5 +1,6 @@
-// @ts-nocheck
+// @ts-check
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EditorView } from "@codemirror/view";
 import DashboardLayout from "./components/layout/DashboardLayout.tsx";
 import DocumentTabs from "./components/documents/DocumentTabs.tsx";
 import CodeMirrorEditor from "./components/editor/CodeMirrorEditor.tsx";
@@ -20,7 +21,7 @@ export default function App() {
   const isDarkMode = resolvedTheme === "dark";
 
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const editorViewRef = useRef<any>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isEditorScrolling, setIsEditorScrolling] = useState(false);
@@ -318,6 +319,7 @@ export default function App() {
 
           {isMobile && (
             <button
+              type="button"
               onClick={toggleView}
               className="md:hidden fixed bottom-[16vh] right-6 z-30 bg-neutral-200 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-white p-3 rounded-md"
               aria-label={`Switch to ${

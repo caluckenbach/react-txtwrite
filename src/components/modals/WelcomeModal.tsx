@@ -65,6 +65,7 @@ const WelcomeModal = () => {
             {/* Graphic element */}
             <div className="mb-8 flex justify-start">
               <button
+                type="button"
                 onClick={closeModal}
                 className="px-8 py-4 text-neutral-700 text-xl font-medium rounded-lg flex items-center relative cursor-pointer hover:text-neutral-500"
               >

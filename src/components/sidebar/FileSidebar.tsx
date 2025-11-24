@@ -1,21 +1,17 @@
-// @ts-nocheck
+// @ts-check
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
-  CreditCard,
   Edit2,
   File,
   FilePlus,
   FileText,
   Folder,
   FolderPlus,
-  HelpCircle,
-  LogOut,
   MoreVertical,
-  Plus,
   Trash2,
 } from "lucide-react";
 
@@ -393,12 +389,14 @@ const FileItem = ({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs rounded hover:bg-neutral-200 dark:hover:bg-neutral-700"
                   onClick={() => setConfirmDelete(false)}
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   className="px-2 py-1 bg-red-500 dark:bg-red-800 text-white text-xs rounded hover:bg-red-600 dark:hover:bg-red-700"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -573,12 +571,14 @@ const FileItem = ({
               </p>
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs rounded hover:bg-neutral-200 dark:hover:bg-neutral-700"
                   onClick={() => setConfirmDelete(false)}
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   className="px-2 py-1 bg-red-500 dark:bg-red-800 text-white text-xs rounded hover:bg-red-600 dark:hover:bg-red-700"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -609,7 +609,6 @@ export default function FileSidebar({
   // Custom drag and drop state
   const [draggedItem, setDraggedItem] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
-  const [dragImage, setDragImage] = useState(null);
 
   // Load file system from localStorage on init
   useEffect(() => {
@@ -853,7 +852,7 @@ export default function FileSidebar({
 
   // Rename file or folder
   const handleRename = (itemId, newName) => {
-    let updatedFileSystem = updateItemInFileSystem(
+    const updatedFileSystem = updateItemInFileSystem(
       fileSystem,
       itemId,
       (item) => {
@@ -977,7 +976,7 @@ export default function FileSidebar({
     setDropTarget(null);
   };
 
-  const handleDragEnter = (item, event) => {
+  const handleDragEnter = (item, _event) => {
     // Prevent dropping an item onto itself
     if (draggedItem && draggedItem.id === item.id) {
       setDropTarget(null);
@@ -997,7 +996,7 @@ export default function FileSidebar({
     }
   };
 
-  const handleDragOver = (item, position, event) => {
+  const handleDragOver = (item, position, _event) => {
     // Prevent dropping an item onto itself
     if (draggedItem && draggedItem.id === item.id) {
       setDropTarget(null);
@@ -1173,12 +1172,14 @@ export default function FileSidebar({
   const renderRootActions = () => (
     <div className="flex flex-row pe-2">
       <button
+        type="button"
         onClick={() => handleCreateFile()}
         className="flex items-center px-1.5 py-1 hover:bg-neutral-200 hover:dark:bg-neutral-700 rounded text-xs text-neutral-400 dark:text-neutral-300"
       >
         <FilePlus size={12} />
       </button>
       <button
+        type="button"
         onClick={() => handleCreateFolder()}
         className="flex items-center px-1.5 py-1 hover:bg-neutral-200 hover:dark:bg-neutral-700 rounded text-xs text-neutral-400 dark:text-neutral-300"
       >
@@ -1188,7 +1189,7 @@ export default function FileSidebar({
   );
 
   // Create a dragging ghost element to show what's being dragged
-  const createDragGhost = (item) => {
+  const _createDragGhost = (item) => {
     const ghost = document.createElement("div");
 
     ghost.className =

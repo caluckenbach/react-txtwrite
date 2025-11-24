@@ -1,7 +1,3 @@
-export interface DocumentMetadata {
-  [key: string]: unknown;
-}
-
 export interface DocumentRecord {
   id: string;
   user_id: string;
@@ -13,7 +9,7 @@ export interface DocumentRecord {
   created_at: string;
   updated_at: string;
   last_synced_at: string;
-  metadata: DocumentMetadata;
+  metadata: Record<string, unknown>;
   folder_id: string;
 }
 
@@ -37,36 +33,3 @@ export interface RestoredDocumentPayload {
   restored_from: string;
   restored_at: string;
 }
-
-export interface SelectionState {
-  start: number;
-  end: number;
-  active: boolean;
-  text: string;
-}
-
-export interface CursorPosition {
-  line: number;
-  column: number;
-  charIndex: number;
-}
-
-export interface FileSystemFolder {
-  id: string;
-  name: string;
-  type: "folder";
-  children: FileSystemItem[];
-}
-
-export interface FileSystemFile {
-  id: string;
-  name: string;
-  type: "markdown" | "file";
-  documentRef?: string;
-}
-
-export type FileSystemItem = FileSystemFolder | FileSystemFile;
-
-export type FileSystemMapEntry =
-  | (FileSystemFolder & { parentId: string | null })
-  | (FileSystemFile & { parentId: string | null });

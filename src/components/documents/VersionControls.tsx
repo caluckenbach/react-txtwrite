@@ -33,6 +33,7 @@ export default function VersionControls({
           restoreVersion={restoreVersion}
         />
         <button
+          type="button"
           onClick={() => setShowVersionHistory(true)}
           className="hover:bg-neutral-200 dark:hover:bg-neutral-800 p-1 rounded"
           title="View Version History"
@@ -40,6 +41,7 @@ export default function VersionControls({
           <History className="w-4 text-neutral-400 dark:text-neutral-700 hover:text-neutral-500" />
         </button>
         <button
+          type="button"
           onClick={() => {
             globalThis.dispatchEvent(new CustomEvent("save-document-version"));
           }}

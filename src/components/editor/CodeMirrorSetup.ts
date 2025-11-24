@@ -18,7 +18,7 @@ import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 
 // Create a custom highlight style specifically for markdown
-export const markdownHighlightStyle = HighlightStyle.define([
+const _markdownHighlightStyle = HighlightStyle.define([
   // Original styles (unchanged)
   { tag: tags.heading, fontWeight: "bold", class: "cm-heading" },
   { tag: tags.heading1, fontSize: "1.6em", class: "cm-heading-1" },
@@ -169,7 +169,7 @@ const createFormattingKeymap = (() => {
 })();
 
 // Debounce helper for scroll events
-function debounce<T extends (...args: any[]) => void>(
+function debounce<T extends (...args: unknown[]) => void>(
   fn: T,
   delay: number,
 ): (...args: Parameters<T>) => void {
@@ -207,7 +207,7 @@ export const createMarkdownExtensions = (
     // highlightActiveLine(), // Commenting out to improve performance
     highlightActiveLineGutter(),
     history(),
-    syntaxHighlighting(markdownHighlightStyle),
+    syntaxHighlighting(_markdownHighlightStyle),
     markdown({
       base: markdownLanguage,
       codeLanguages: languages,
@@ -244,7 +244,7 @@ export const createMarkdownExtensions = (
 };
 
 // Create an initial editor state
-export const createEditorState = (
+const _createEditorState = (
   initialContent: string,
   extensions: Extension[],
 ): EditorState => {

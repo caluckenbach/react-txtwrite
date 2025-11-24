@@ -1,65 +1,12 @@
-// @ts-nocheck
+// @ts-check
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Clock,
-  CreditCard,
-  HelpCircle,
-  Highlighter,
-  LogOut,
-  Menu,
-  Save,
-  X,
-} from "lucide-react";
-import MenuButton from "../ui/MenuButton.tsx";
+import { X } from "lucide-react";
 import WelcomeModal from "../modals/WelcomeModal.tsx";
 import VersionControls from "../documents/VersionControls.tsx";
 import ThemeToggle from "../ui/ThemeToggle.tsx";
 import FileSidebar from "../sidebar/FileSidebar.tsx";
-
-// Define menu configurations
-const fileMenuItems = [
-  {
-    label: "New Document",
-    onClick: () => {
-      globalThis.dispatchEvent(new CustomEvent("create-new-document"));
-    },
-    shortcut: "⌘+N",
-  },
-  {
-    label: "Open...",
-    onClick: () => console.log("Open clicked"),
-    shortcut: "⌘+O",
-  },
-  { divider: true },
-  {
-    label: "Export",
-    submenu: [
-      {
-        label: "PDF",
-        onClick: () => console.log("Export as PDF clicked"),
-      },
-      {
-        label: "HTML",
-        onClick: () => console.log("Export as HTML clicked"),
-      },
-    ],
-  },
-];
-
-const historyMenuItems = [
-  {
-    label: "Undo",
-    onClick: () => console.log("Undo clicked"),
-    shortcut: "⌘+Z",
-  },
-  {
-    label: "Redo",
-    onClick: () => console.log("Redo clicked"),
-    shortcut: "⇧+⌘+Z",
-  },
-];
 
 export default function DashboardLayout({ children }) {
   const [contentVisible, setContentVisible] = useState(false);
@@ -67,11 +14,9 @@ export default function DashboardLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDocument, setActiveDocument] = useState(null);
   const [documentTitle, setDocumentTitle] = useState("");
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [documents, setDocuments] = useState([]);
 
   // Add these state hooks
-  const [documentVersions, setDocumentVersions] = useState([]);
   const [getVersionsFn, setGetVersionsFn] = useState(null);
   const [restoreVersionFn, setRestoreVersionFn] = useState(null);
 
@@ -318,6 +263,7 @@ export default function DashboardLayout({ children }) {
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-neutral-700 dark:text-neutral-400"
                   aria-label="Close menu"
